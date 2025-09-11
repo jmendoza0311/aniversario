@@ -9,6 +9,16 @@ interface YoutubePlayer {
   destroy: () => void
 }
 
+interface YouTubePlayerConfig {
+  width: string
+  height: string
+  videoId: string
+  playerVars: Record<string, number | string>
+  events: {
+    onReady: (event: { target: YoutubePlayer }) => void
+  }
+}
+
 interface BackgroundMusicProps {
   paused: boolean
 }
@@ -22,10 +32,15 @@ export default function BackgroundMusic({ paused }: BackgroundMusicProps) {
   // Load IFrame API once
   useEffect(() => {
     if (typeof window === 'undefined') return
-    const w = window as Window & { YT?: any; onYouTubeIframeAPIReady?: () => void }
+    const w = window as Window & { 
+      YT?: { 
+        Player: new (container: HTMLElement, config: YouTubePlayerConfig) => YoutubePlayer
+      }; 
+      onYouTubeIframeAPIReady?: () => void 
+    }
 
     const onYouTubeIframeAPIReady = () => {
-      if (!containerRef.current || playerRef.current) return
+      if (!containerRef.current || playerRef.current || !w.YT) return
       playerRef.current = new w.YT.Player(containerRef.current, {
         width: '0',
         height: '0',

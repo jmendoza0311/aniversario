@@ -4,7 +4,6 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { songs, Song } from '../data/musicData'
 import { Play, Pause, ExternalLink, Heart, Music2, Volume2, AlertCircle } from 'lucide-react'
-import { Button } from './ui/button'
 import { useAudioContext } from '../contexts/AudioContext'
 
 export default function Music() {

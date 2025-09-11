@@ -38,7 +38,7 @@ export default function Puzzle() {
   const [completionTime, setCompletionTime] = useState<number>(0)
   const [draggedPiece, setDraggedPiece] = useState<number | null>(null)
   const [touchStartPos, setTouchStartPos] = useState<{x: number, y: number} | null>(null)
-  const [puzzleMode, setPuzzleMode] = useState<PuzzleMode>('sliding')
+  const [, setPuzzleMode] = useState<PuzzleMode>('sliding')
   const [showModeModal, setShowModeModal] = useState(false)
 
   // Jigsaw drag state
@@ -153,9 +153,11 @@ export default function Puzzle() {
   }
 
   // Handle drag start
-  const handleDragStart = (e: React.DragEvent, pieceIndex: number) => {
+  const handleDragStart = (e: React.DragEvent | MouseEvent | TouchEvent | PointerEvent, pieceIndex: number) => {
     setDraggedPiece(pieceIndex)
-    e.dataTransfer.effectAllowed = 'move'
+    if ('dataTransfer' in e && e.dataTransfer) {
+      e.dataTransfer.effectAllowed = 'move'
+    }
   }
 
   // Handle drag over
@@ -164,7 +166,7 @@ export default function Puzzle() {
   }
 
   // Handle drop
-  const handleDrop = (e: React.DragEvent, targetIndex: number) => {
+  const handleDrop = (e: React.DragEvent, _: number) => {
     e.preventDefault()
     if (draggedPiece !== null) {
       handlePieceClick(draggedPiece)
@@ -197,7 +199,7 @@ export default function Puzzle() {
   }
 
   // Start new game
-  const startGame = () => {
+  const _startGame = () => {
     setGameState('playing')
   }
 
@@ -235,7 +237,6 @@ export default function Puzzle() {
       const [top, right, bottom, left] = connectors[r][c]
 
       const knob = (dir: 1 | -1, horizontal: boolean, x: number, y: number) => {
-        const mid = horizontal ? x + size / 2 : y + size / 2
         if (horizontal) {
           return `C ${x + size/3},${y} ${x + size/3},${y - dir*k} ${x + size/2},${y - dir*k} ` +
                  `C ${x + 2*size/3},${y - dir*k} ${x + 2*size/3},${y} ${x + size},${y}`
@@ -676,18 +677,34 @@ export default function Puzzle() {
                 aspectRatio: '1'
               }}
             >
-              {/* Background image */}
+              {/* Capa guía alineada con la grilla para referencia */}
               {selectedImage && (
-                <div 
-                  className="absolute inset-6 rounded-lg overflow-hidden"
+                <div
+                  className="absolute inset-6 grid gap-1 pointer-events-none"
                   style={{
-                    backgroundImage: `url(${selectedImage.src})`,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                    opacity: 0.3,
+                    gridTemplateColumns: `repeat(${gridSize}, 1fr)`,
+                    opacity: 0.28,
                     zIndex: 0
                   }}
-                />
+                >
+                  {Array.from({ length: totalPieces }).map((_, i) => {
+                    const row = Math.floor(i / gridSize)
+                    const col = i % gridSize
+                    return (
+                      <div key={`guide-${i}`} className="rounded-lg overflow-hidden p-px">
+                        <div
+                          className="w-full h-full"
+                          style={{
+                            backgroundImage: `url(${selectedImage.src})`,
+                            backgroundSize: `${gridSize * 100}% ${gridSize * 100}%`,
+                            backgroundPosition: `${(col * 100) / (gridSize - 1)}% ${(row * 100) / (gridSize - 1)}%`,
+                            backgroundRepeat: 'no-repeat'
+                          }}
+                        />
+                      </div>
+                    )
+                  })}
+                </div>
               )}
               
               {pieces.map((piece, index) => {
@@ -701,7 +718,7 @@ export default function Puzzle() {
                     key={`${piece.id}-${index}`}
                     onClick={() => !piece.isEmpty && handlePieceClick(index)}
                     draggable={!piece.isEmpty}
-                    onDragStart={(e) => handleDragStart(e as any, index)}
+                    onDragStart={(e) => handleDragStart(e, index)}
                     onDragOver={handleDragOver}
                     onDrop={(e) => handleDrop(e, index)}
                     onTouchStart={(e) => !piece.isEmpty && handleTouchStart(e, index)}
@@ -808,7 +825,7 @@ export default function Puzzle() {
                 {jigsawPieces.map(piece => (
                   <g key={piece.id}
                     style={{ cursor: piece.placed ? 'default' : 'grab' }}
-                    onPointerDown={(e) => !piece.placed && onJigsawPointerDown(e as any, piece.id)}
+                    onPointerDown={(e) => !piece.placed && onJigsawPointerDown(e as React.PointerEvent<SVGGElement>, piece.id)}
                     transform={`translate(${piece.x - (piece.col * 100)/(gridSize - 1)} ${piece.y - (piece.row * 100)/(gridSize - 1)})`}
                   >
                     <clipPath id={`clip-${piece.id}`}>

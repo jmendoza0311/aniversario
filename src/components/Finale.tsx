@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Play, Heart, Sparkles, Star, X } from 'lucide-react'
+import { Play, Heart, Sparkles, X } from 'lucide-react'
 
 interface Particle {
   id: number

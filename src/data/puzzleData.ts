@@ -12,7 +12,7 @@ export const puzzleImages: PuzzleImage[] = [
     id: 'inicios-rompecabezas',
     title: 'Inicios de nuestra historia',
     description: 'Aquel beso que marcaba el comienzo de nuestra historia',
-    src: 'images/Puzzle/primera.jpg',
+    src: '/images/Puzzle/primera.jpg',
     color: 'from-pink-400 to-rose-500',
     completionMessage: '¡Armaste el momento donde todo comenzó! Ese día supe que eras especial. Tu sonrisa nerviosa era lo más hermoso que había visto. 💕 Desde entonces, cada día contigo ha sido una nueva pieza del rompecabezas perfecto de nuestro amor.'
   },

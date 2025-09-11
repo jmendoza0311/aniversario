@@ -338,7 +338,7 @@ function PhotoLightbox({ photo, onClose }: PhotoLightboxProps) {
                   transition={{ delay: 0.4 }}
                 >
                   <p className="text-lg leading-relaxed text-purple-100 italic">
-                    "{photo.hiddenMessage}"
+                    &quot;{photo.hiddenMessage}&quot;
                   </p>
                 </motion.div>
 
