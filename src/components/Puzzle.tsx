@@ -458,9 +458,7 @@ export default function Puzzle() {
                             <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-300 to-gray-600">
                               <div class="text-center text-gray-600">
                                 <div class="text-4xl mb-2">
-                                  ${image.category === 'memories' ? '💕' :
-                                   image.category === 'trips' ? '✈️' :
-                                   image.category === 'special' ? '⭐' : '🤳'}
+                                  🧩
                                 </div>
                                 <p class="font-semibold">${image.title}</p>
                               </div>
@@ -500,7 +498,7 @@ export default function Puzzle() {
             <Button
               onClick={() => setGameState('select-image')}
               variant="outline"
-              className="mb-8 border-white/20 text-white hover:bg-white/10"
+              className="mb-8"
             >
               ← Cambiar imagen
             </Button>
@@ -609,7 +607,7 @@ export default function Puzzle() {
                     <div className="mt-6 text-right">
                       <Button
                         variant="outline"
-                        className="border-white/20 text-white hover:bg-white/10"
+                        size="sm"
                         onClick={() => setShowModeModal(false)}
                       >
                         Cancelar
@@ -636,7 +634,7 @@ export default function Puzzle() {
               <Button
                 onClick={() => setGameState('select-difficulty')}
                 variant="outline"
-                className="border-white/20 text-white hover:bg-white/10"
+                size="sm"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Atrás
@@ -651,7 +649,7 @@ export default function Puzzle() {
               <Button
                 onClick={initializePuzzle}
                 variant="outline"
-                className="border-white/20 text-white hover:bg-white/10"
+                size="sm"
               >
                 <Shuffle className="h-4 w-4 mr-2" />
                 Mezclar
@@ -659,7 +657,7 @@ export default function Puzzle() {
               <Button
                 onClick={resetToOriginal}
                 variant="outline"
-                className="border-white/20 text-white hover:bg-white/10"
+                size="sm"
               >
                 <RotateCcw className="h-4 w-4 mr-2" />
                 Reiniciar
@@ -758,7 +756,7 @@ export default function Puzzle() {
               <Button
                 onClick={() => setGameState('select-difficulty')}
                 variant="outline"
-                className="border-white/20 text-white hover:bg-white/10"
+                size="sm"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Atrás
@@ -770,7 +768,7 @@ export default function Puzzle() {
               <Button
                 onClick={initializeJigsaw}
                 variant="outline"
-                className="border-white/20 text-white hover:bg-white/10"
+                size="sm"
               >
                 <Shuffle className="h-4 w-4 mr-2" />
                 Mezclar
@@ -778,7 +776,7 @@ export default function Puzzle() {
               <Button
                 onClick={resetJigsawToOriginal}
                 variant="outline"
-                className="border-white/20 text-white hover:bg-white/10"
+                size="sm"
               >
                 <RotateCcw className="h-4 w-4 mr-2" />
                 Reiniciar
@@ -918,7 +916,6 @@ export default function Puzzle() {
                   setGameState('select-difficulty')
                 }}
                 size="lg"
-                className="bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600 text-white px-8 py-4 text-lg font-semibold rounded-full"
               >
                 Jugar de Nuevo
               </Button>
@@ -926,7 +923,6 @@ export default function Puzzle() {
                 onClick={resetGame}
                 size="lg"
                 variant="outline"
-                className="border-white/20 text-white hover:bg-white/10 px-8 py-4 text-lg font-semibold rounded-full"
               >
                 Elegir Otra Imagen
               </Button>

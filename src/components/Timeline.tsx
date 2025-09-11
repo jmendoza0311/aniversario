@@ -249,22 +249,45 @@ function TimelinePoint({ item, index, isHovered, onHover, onLeave, onImageClick,
             : 'flex-1'
         }`}
         animate={{
-          y: isHovered ? -10 : 0,
-          scale: isHovered ? 1.05 : 1,
+          y: isHovered ? -12 : 0,
+          scale: isHovered ? 1.03 : 1,
+          rotateY: isHovered ? 2 : 0,
         }}
-        transition={{ duration: 0.3 }}
+        transition={{ 
+          duration: 0.6,
+          type: "spring",
+          stiffness: 200,
+          damping: 25,
+          ease: [0.25, 0.46, 0.45, 0.94]
+        }}
       >
-        <div className="relative overflow-hidden rounded-lg sm:rounded-xl bg-white/10 p-4 sm:p-6 backdrop-blur-sm transition-all duration-300 hover:bg-white/20">
+        <div className="relative overflow-hidden rounded-lg sm:rounded-xl bg-white/10 p-4 sm:p-6 backdrop-blur-sm transition-all duration-600 ease-out hover:bg-white/20 hover:shadow-2xl hover:shadow-pink-500/20">
           {/* Image */}
           <motion.div 
             className="mb-3 sm:mb-4 overflow-hidden rounded-md sm:rounded-lg cursor-pointer touch-manipulation"
             onClick={onImageClick}
             animate={{
-              scale: isHovered ? 1.1 : 1,
+              scale: isHovered ? 1.08 : 1,
             }}
-            transition={{ duration: 0.3 }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            transition={{ 
+              duration: 0.5,
+              type: "spring",
+              stiffness: 200,
+              damping: 20
+            }}
+            whileHover={{ 
+              scale: 1.06,
+              transition: {
+                duration: 0.4,
+                type: "spring",
+                stiffness: 300,
+                damping: 25
+              }
+            }}
+            whileTap={{ 
+              scale: 0.96,
+              transition: { duration: 0.2 }
+            }}
           >
             <div className="relative h-32 sm:h-40 md:h-48 w-full overflow-hidden">
               {item.video && item.video.trim() !== '' ? (

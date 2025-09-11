@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Volume2, VolumeX } from 'lucide-react'
 import { Button } from './ui/button'
-import FloatingThemeToggle from './FloatingThemeToggle'
 
 interface Star {
   id: number
@@ -61,7 +60,7 @@ export default function WelcomeScreen({ onEnter }: WelcomeScreenProps) {
   }
 
   return (
-    <div className="relative h-screen overflow-hidden bg-gradient-to-b from-indigo-900 via-purple-900 to-black dark:from-slate-900 dark:via-blue-900 dark:to-gray-900">
+    <div className="relative h-screen overflow-hidden bg-gradient-to-b from-slate-900 via-purple-900 to-black">
       {/* Starry Sky Background */}
       <div className="absolute inset-0">
         {stars.map(star => (
@@ -100,18 +99,23 @@ export default function WelcomeScreen({ onEnter }: WelcomeScreenProps) {
         }}
       />
 
-      <FloatingThemeToggle />
-
       {/* Content */}
       <div className="relative z-10 flex h-full flex-col items-center justify-center px-4 sm:px-6 md:px-8 text-center">
         {/* Main Text */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 2, delay: 0.5 }}
+          initial={{ opacity: 0, y: 40, scale: 0.9 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ 
+            duration: 2.5, 
+            delay: 0.8,
+            type: "spring",
+            stiffness: 60,
+            damping: 20,
+            ease: [0.25, 0.46, 0.45, 0.94]
+          }}
           className="mb-8 sm:mb-12"
         >
-          <h1 className="mb-4 text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold text-white dark:text-blue-100">
+          <h1 className="mb-4 text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold text-white">
             <motion.span
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -122,10 +126,17 @@ export default function WelcomeScreen({ onEnter }: WelcomeScreenProps) {
             </motion.span>
           </h1>
           <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1.5, delay: 2 }}
-            className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-gray-200 dark:text-blue-200"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ 
+              duration: 2, 
+              delay: 2.5,
+              type: "spring",
+              stiffness: 50,
+              damping: 25,
+              ease: [0.25, 0.46, 0.45, 0.94]
+            }}
+            className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-gray-200"
           >
             comenzó nuestra aventura...
           </motion.p>
@@ -133,9 +144,16 @@ export default function WelcomeScreen({ onEnter }: WelcomeScreenProps) {
 
         {/* Enter Button */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1, delay: 3 }}
+          initial={{ opacity: 0, scale: 0.8, y: 30 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ 
+            duration: 1.5, 
+            delay: 3.5,
+            type: "spring",
+            stiffness: 120,
+            damping: 20,
+            ease: [0.25, 0.46, 0.45, 0.94]
+          }}
         >
           <Button
             onClick={handleEnter}
@@ -175,7 +193,6 @@ export default function WelcomeScreen({ onEnter }: WelcomeScreenProps) {
             onClick={() => setMusicEnabled(!musicEnabled)}
             variant="outline"
             size="sm"
-            className="border-white/20 bg-black/20 text-white backdrop-blur-sm hover:bg-white/10"
           >
             {musicEnabled ? (
               <Volume2 className="h-4 w-4" />

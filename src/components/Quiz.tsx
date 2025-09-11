@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { quizQuestions, categories, getScoreFeedback, QuizQuestion } from '../data/quizData'
 import { Check, X, RotateCcw, Trophy, Heart, ChevronRight } from 'lucide-react'
@@ -273,9 +273,21 @@ export default function Quiz() {
                         key={index}
                         onClick={() => handleAnswerSelect(index)}
                         disabled={selectedAnswer !== null}
-                        whileHover={selectedAnswer === null ? { scale: 1.02, x: 5 } : {}}
-                        whileTap={selectedAnswer === null ? { scale: 0.98 } : {}}
-                        className={`p-4 md:p-6 rounded-2xl border-2 transition-all duration-300 text-left font-semibold text-lg ${buttonClass} disabled:cursor-not-allowed shadow-lg hover:shadow-xl`}
+                        whileHover={selectedAnswer === null ? { 
+                          scale: 1.03, 
+                          x: 8,
+                          transition: {
+                            duration: 0.4,
+                            type: "spring",
+                            stiffness: 300,
+                            damping: 25
+                          }
+                        } : {}}
+                        whileTap={selectedAnswer === null ? { 
+                          scale: 0.97,
+                          transition: { duration: 0.2 }
+                        } : {}}
+                        className={`p-4 md:p-6 rounded-2xl border-2 transition-all duration-500 ease-out text-left font-semibold text-lg ${buttonClass} disabled:cursor-not-allowed shadow-lg hover:shadow-xl hover:shadow-purple-500/25`}
                       >
                         <div className="flex items-center justify-between">
                           <span>{option}</span>

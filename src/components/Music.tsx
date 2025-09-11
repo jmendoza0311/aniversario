@@ -1,27 +1,21 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { songs, categories, moods, Song } from '../data/musicData'
-import { Play, Pause, ExternalLink, Heart, Music2, Volume2, Filter } from 'lucide-react'
+import { songs, Song } from '../data/musicData'
+import { Play, Pause, ExternalLink, Heart, Music2, Volume2, AlertCircle } from 'lucide-react'
 import { Button } from './ui/button'
+import { useAudioContext } from '../contexts/AudioContext'
 
 export default function Music() {
-  const [selectedCategory, setSelectedCategory] = useState('all')
-  const [playingSong, setPlayingSong] = useState<string | null>(null)
   const [selectedSong, setSelectedSong] = useState<Song | null>(null)
-  const [showFilters, setShowFilters] = useState(false)
-
-  const filteredSongs = selectedCategory === 'all' 
-    ? songs 
-    : songs.filter(song => song.category === selectedCategory)
+  
+  const audioContext = useAudioContext()
 
   const handlePlaySong = (songId: string) => {
-    if (playingSong === songId) {
-      setPlayingSong(null)
-    } else {
-      setPlayingSong(songId)
-    }
+    const song = songs.find(s => s.id === songId)
+    const audioSrc = song?.audioFile
+    audioContext.play(songId, audioSrc)
   }
 
   const openSongModal = (song: Song) => {
@@ -52,70 +46,48 @@ export default function Music() {
           </p>
         </motion.div>
 
-        {/* Filters Toggle */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex justify-center mb-6 sm:mb-8"
-        >
-          <Button
-            onClick={() => setShowFilters(!showFilters)}
-            variant="outline"
-            className="border-white/20 text-white hover:bg-white/10 backdrop-blur-sm"
-          >
-            <Filter className="h-4 w-4 mr-2" />
-            {showFilters ? 'Ocultar Filtros' : 'Mostrar Filtros'}
-          </Button>
-        </motion.div>
 
-        {/* Category Filters */}
-        <AnimatePresence>
-          {showFilters && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              className="mb-12 overflow-hidden"
-            >
-              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
-                {categories.map((category) => (
-                  <motion.button
-                    key={category.id}
-                    onClick={() => setSelectedCategory(category.id)}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className={`p-4 rounded-2xl transition-all duration-300 text-center ${
-                      selectedCategory === category.id
-                        ? 'bg-white text-purple-900 shadow-lg'
-                        : 'bg-white/10 text-white hover:bg-white/20 backdrop-blur-sm'
-                    }`}
-                  >
-                    <div className="text-2xl mb-2">{category.icon}</div>
-                    <div className="text-sm font-semibold mb-1">{category.name}</div>
-                    <div className="text-xs opacity-70">{category.count} {category.count === 1 ? 'canción' : 'canciones'}</div>
-                  </motion.button>
-                ))}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
 
         {/* Songs List */}
         <div className="grid gap-6 max-w-4xl mx-auto">
           <AnimatePresence mode="popLayout">
-            {filteredSongs.map((song, index) => (
+            {songs.map((song, index) => (
               <motion.div
                 key={song.id}
                 layout
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
+                initial={{ opacity: 0, y: 30, scale: 0.95, rotateX: -10 }}
+                animate={{ opacity: 1, y: 0, scale: 1, rotateX: 0 }}
+                exit={{ 
+                  opacity: 0, 
+                  scale: 0.9, 
+                  y: -20,
+                  transition: { duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }
+                }}
+                transition={{ 
+                  duration: 0.8, 
+                  delay: index * 0.15,
+                  type: "spring",
+                  stiffness: 100,
+                  damping: 20,
+                  ease: [0.25, 0.46, 0.45, 0.94]
+                }}
+                whileHover={{
+                  y: -5,
+                  scale: 1.02,
+                  transition: {
+                    duration: 0.4,
+                    type: "spring",
+                    stiffness: 300,
+                    damping: 25
+                  }
+                }}
                 className="group"
               >
                 <SongCard
                   song={song}
-                  isPlaying={playingSong === song.id}
+                  isPlaying={audioContext.currentSong === song.id && audioContext.isPlaying}
+                  isLoading={audioContext.currentSong === song.id && audioContext.isLoading}
+                  error={audioContext.currentSong === song.id ? audioContext.error : null}
                   onPlay={() => handlePlaySong(song.id)}
                   onOpenDetails={() => openSongModal(song)}
                 />
@@ -124,32 +96,21 @@ export default function Music() {
           </AnimatePresence>
         </div>
 
-        {/* Results counter */}
-        <motion.div
-          className="text-center mt-12"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-        >
-          <p className="text-purple-200">
-            Mostrando {filteredSongs.length} {filteredSongs.length === 1 ? 'canción' : 'canciones'}
-            {selectedCategory !== 'all' && (
-              <span> de {categories.find(c => c.id === selectedCategory)?.name}</span>
-            )}
-          </p>
-        </motion.div>
 
         {/* Song Detail Modal */}
         <AnimatePresence>
           {selectedSong && (
             <SongModal
               song={selectedSong}
-              isPlaying={playingSong === selectedSong.id}
+              isPlaying={audioContext.currentSong === selectedSong.id && audioContext.isPlaying}
+              isLoading={audioContext.currentSong === selectedSong.id && audioContext.isLoading}
+              error={audioContext.currentSong === selectedSong.id ? audioContext.error : null}
               onPlay={() => handlePlaySong(selectedSong.id)}
               onClose={closeSongModal}
             />
           )}
         </AnimatePresence>
+
       </div>
     </section>
   )
@@ -158,17 +119,32 @@ export default function Music() {
 interface SongCardProps {
   song: Song
   isPlaying: boolean
+  isLoading?: boolean
+  error?: string | null
   onPlay: () => void
   onOpenDetails: () => void
 }
 
-function SongCard({ song, isPlaying, onPlay, onOpenDetails }: SongCardProps) {
-  const mood = moods.find(m => m.id === song.mood)
+function SongCard({ song, isPlaying, isLoading, error, onPlay, onOpenDetails }: SongCardProps) {
 
   return (
     <motion.div
-      className="bg-white/10 backdrop-blur-sm rounded-3xl p-6 border border-white/20 hover:border-white/40 transition-all duration-300 group cursor-pointer"
-      whileHover={{ y: -5, scale: 1.02 }}
+      className="bg-white/10 backdrop-blur-sm rounded-3xl p-6 border border-white/20 hover:border-white/40 transition-all duration-500 ease-out group cursor-pointer hover:shadow-2xl hover:shadow-purple-500/20"
+      whileHover={{ 
+        y: -8, 
+        scale: 1.03,
+        rotateY: 1,
+        transition: {
+          duration: 0.5,
+          type: "spring",
+          stiffness: 300,
+          damping: 30
+        }
+      }}
+      whileTap={{ 
+        scale: 0.98,
+        transition: { duration: 0.2 }
+      }}
       onClick={onOpenDetails}
     >
       <div className="flex items-center space-x-6">
@@ -189,8 +165,15 @@ function SongCard({ song, isPlaying, onPlay, onOpenDetails }: SongCardProps) {
             className="absolute inset-0 bg-black/60 rounded-2xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
+            disabled={isLoading}
           >
-            {isPlaying ? (
+            {isLoading ? (
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                className="h-8 w-8 border-2 border-white border-t-transparent rounded-full"
+              />
+            ) : isPlaying ? (
               <Pause className="h-8 w-8 text-white" />
             ) : (
               <Play className="h-8 w-8 text-white ml-1" />
@@ -210,17 +193,20 @@ function SongCard({ song, isPlaying, onPlay, onOpenDetails }: SongCardProps) {
               </p>
             </div>
             
-            {/* Mood indicator */}
-            <div className={`flex items-center space-x-1 ${mood?.color}`}>
-              <span className="text-sm">{mood?.icon}</span>
-              <span className="text-xs font-medium">{mood?.name}</span>
-            </div>
           </div>
 
           {/* Explanation */}
           <p className="text-white/80 text-sm leading-relaxed mb-4 line-clamp-2">
             {song.explanation}
           </p>
+
+          {/* Error Message */}
+          {error && (
+            <div className="flex items-center space-x-2 text-red-400 text-xs mb-3">
+              <AlertCircle className="h-4 w-4" />
+              <span>{error}</span>
+            </div>
+          )}
 
           {/* Streaming Links */}
           <div className="flex items-center justify-between">
@@ -271,11 +257,13 @@ function SongCard({ song, isPlaying, onPlay, onOpenDetails }: SongCardProps) {
 interface SongModalProps {
   song: Song
   isPlaying: boolean
+  isLoading?: boolean
+  error?: string | null
   onPlay: () => void
   onClose: () => void
 }
 
-function SongModal({ song, isPlaying, onPlay, onClose }: SongModalProps) {
+function SongModal({ song, isPlaying, isLoading, error, onPlay, onClose }: SongModalProps) {
   return (
     <motion.div
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
@@ -309,11 +297,30 @@ function SongModal({ song, isPlaying, onPlay, onClose }: SongModalProps) {
               
               <motion.button
                 onClick={onPlay}
-                className="bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full p-4 transition-all duration-300"
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
+                className="bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full p-4 transition-all duration-400 ease-out hover:shadow-lg hover:shadow-white/25"
+                whileHover={{ 
+                  scale: 1.15,
+                  rotate: 360,
+                  transition: {
+                    duration: 0.6,
+                    type: "spring",
+                    stiffness: 200,
+                    damping: 20
+                  }
+                }}
+                whileTap={{ 
+                  scale: 0.9,
+                  transition: { duration: 0.2 }
+                }}
+                disabled={isLoading}
               >
-                {isPlaying ? (
+                {isLoading ? (
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                    className="h-8 w-8 border-2 border-white border-t-transparent rounded-full"
+                  />
+                ) : isPlaying ? (
                   <Pause className="h-8 w-8 text-white" />
                 ) : (
                   <Play className="h-8 w-8 text-white ml-1" />
@@ -335,6 +342,14 @@ function SongModal({ song, isPlaying, onPlay, onClose }: SongModalProps) {
               <h2 className="text-3xl lg:text-4xl font-bold mb-2">{song.title}</h2>
               <p className="text-purple-200 text-lg mb-1">{song.artist}</p>
               <p className="text-purple-300 text-sm mb-6">{song.album} ({song.year}) • {song.genre}</p>
+
+              {/* Error Message */}
+              {error && (
+                <div className="flex items-center space-x-2 text-red-400 text-sm mb-6 bg-red-500/10 border border-red-500/20 rounded-xl p-4">
+                  <AlertCircle className="h-5 w-5 flex-shrink-0" />
+                  <span>{error}</span>
+                </div>
+              )}
 
               {/* Explanation */}
               <div className="mb-8">
@@ -437,7 +452,6 @@ function WaveAnimation({ color, overlay }: WaveAnimationProps) {
           transition={{ duration: 1.5, repeat: Infinity }}
           className="text-white/60 text-xs"
         >
-          Reproduciendo...
         </motion.div>
       </div>
     </div>

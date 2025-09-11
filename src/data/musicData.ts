@@ -16,6 +16,7 @@ export interface Song {
   }
   color: string
   mood: 'romantic' | 'happy' | 'nostalgic' | 'energetic' | 'emotional'
+  audioFile?: string // Ruta del archivo de audio local (opcional)
 }
 
 export const songs: Song[] = [
@@ -110,14 +111,14 @@ export const songs: Song[] = [
     mood: 'emotional'
   },
   {
-    id: 'promero-fonseca',
-    title: 'Promero',
+    id: 'prometo-fonseca',
+    title: 'Prometo',
     artist: 'Fonseca',
     album: 'Agustín',
     year: 2015,
     genre: 'Vallenato/Pop',
     category: 'especiales',
-    albumCover: '/images/music/promero-fonseca.jpg',
+    albumCover: '/images/music/prometo-fonseca.jpg',
     explanation: 'Esta canción habla de promesas y compromisos del corazón. Exactamente lo que siento por ti.',
     memory: 'La pusiste un día mientras cocinábamos juntos. Empezaste a cantarla y a bailar por la cocina. "Te prometo ser tu compañero", cantabas señalándome. Mi corazón se llenó de amor. 👨‍🍳💕',
     links: {

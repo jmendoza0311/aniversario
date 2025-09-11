@@ -1,8 +1,7 @@
 'use client'
 
-import { motion, AnimatePresence } from 'framer-motion'
-import { X, Home, Clock, Map, Camera, Heart, Puzzle, Music, Sparkles } from 'lucide-react'
-import ThemeToggle from './ThemeToggle'
+import { motion } from 'framer-motion'
+import { X, Home, Clock, Camera, Heart, Puzzle, Music, Sparkles } from 'lucide-react'
 
 interface ModalNavigationProps {
   currentModal: 'timeline' | 'gallery' | 'quiz' | 'puzzle' | 'music' | 'finale' | null
@@ -81,7 +80,7 @@ export default function ModalNavigation({ currentModal, onNavigate, onClose }: M
             return (
               <button
                 key={section.id}
-                onClick={() => onNavigate(section.id as any)}
+                onClick={() => onNavigate(section.id as 'timeline' | 'gallery' | 'quiz' | 'puzzle' | 'music' | 'finale')}
                 className={`relative p-1.5 sm:p-2 rounded-full font-medium text-xs sm:text-sm transition-all duration-300 flex items-center space-x-1 sm:space-x-2 touch-manipulation ${
                   isActive 
                     ? 'text-white' 
@@ -101,12 +100,6 @@ export default function ModalNavigation({ currentModal, onNavigate, onClose }: M
               </button>
             )
           })}
-
-          {/* Separator */}
-          <div className="w-px h-5 sm:h-6 bg-white/20" />
-
-          {/* Theme Toggle */}
-          <ThemeToggle />
 
           {/* Separator */}
           <div className="w-px h-5 sm:h-6 bg-white/20" />

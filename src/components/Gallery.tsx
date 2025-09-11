@@ -135,13 +135,35 @@ interface PhotoCardProps {
 }
 
 function PhotoCard({ photo, onClick }: PhotoCardProps) {
-  const aspectRatio = photo.height / photo.width
+  // const aspectRatio = photo.height / photo.width
   
   return (
     <motion.div
-      className="group cursor-pointer relative overflow-hidden rounded-2xl bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm border border-white/10 shadow-xl"
-      whileHover={{ y: -5, scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
+      className="group cursor-pointer relative overflow-hidden rounded-2xl bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm border border-white/10 shadow-xl hover:shadow-2xl hover:shadow-pink-500/20"
+      initial={{ opacity: 0, scale: 0.9, y: 20 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      transition={{
+        duration: 0.8,
+        type: "spring",
+        stiffness: 100,
+        damping: 20,
+        ease: [0.25, 0.46, 0.45, 0.94]
+      }}
+      whileHover={{ 
+        y: -8, 
+        scale: 1.03,
+        rotateY: 2,
+        transition: {
+          duration: 0.5,
+          type: "spring",
+          stiffness: 300,
+          damping: 25
+        }
+      }}
+      whileTap={{ 
+        scale: 0.98,
+        transition: { duration: 0.2 }
+      }}
       onClick={onClick}
     >
       {/* Photo with aspect ratio */}

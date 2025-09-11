@@ -57,7 +57,7 @@ export default function Finale() {
     const interval = isMobile ? 400 : 200 // Slower interval on mobile
     const maxParticles = isMobile ? 20 : 50 // Fewer max particles on mobile
     
-    const intervalId = setInterval(() => {
+    setInterval(() => {
       // Create heart particles
       const newParticles: Particle[] = []
       
@@ -337,7 +337,7 @@ export default function Finale() {
                       transition={{ duration: 1 }}
                       className="text-lg sm:text-2xl md:text-4xl text-purple-200 font-light"
                     >
-                      cada día... 💕
+                      cada día...💜 
                     </motion.p>
                   )}
                 </AnimatePresence>

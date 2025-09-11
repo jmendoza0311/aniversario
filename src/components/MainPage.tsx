@@ -1,8 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Clock, Map, Camera, Heart, Puzzle, Music, Sparkles } from 'lucide-react'
-import FloatingThemeToggle from './FloatingThemeToggle'
+import { Clock, Camera, Heart, Puzzle, Music, Sparkles } from 'lucide-react'
 
 interface MainPageProps {
   onOpenModal: (modalType: 'timeline' | 'gallery' | 'quiz' | 'puzzle' | 'music' | 'finale') => void
@@ -15,7 +14,7 @@ const sections = [
     description: '7 años de momentos únicos en una línea de tiempo interactiva',
     icon: Clock,
     color: 'from-pink-500 via-rose-500 to-red-500',
-    gradient: 'from-pink-900/20 to-rose-900/20',
+    gradient: 'bg-gradient-to-br from-pink-500/15 via-rose-600/20 to-red-500/15 backdrop-blur-xl border-pink-400/20',
     emoji: '⏰'
   },
   {
@@ -24,7 +23,7 @@ const sections = [
     description: 'Fotos con mensajes secretos y filtros por categorías',
     icon: Camera,
     color: 'from-purple-500 via-indigo-500 to-blue-500',
-    gradient: 'from-pink-900/20 to-rose-900/20',
+    gradient: 'bg-gradient-to-br from-indigo-500/15 via-purple-600/20 to-blue-600/15 backdrop-blur-xl border-indigo-400/20',
     emoji: '📸'
   },
   {
@@ -33,7 +32,7 @@ const sections = [
     description: '¿Qué tanto nos conocemos? Descúbrelo con este divertido quiz',
     icon: Heart,
     color: 'from-emerald-500 via-teal-500 to-cyan-500',
-    gradient: 'from-emerald-900/20 to-teal-900/20',
+    gradient: 'bg-gradient-to-br from-emerald-500/15 via-teal-600/20 to-cyan-500/15 backdrop-blur-xl border-emerald-400/20',
     emoji: '🎯'
   },
   {
@@ -42,7 +41,7 @@ const sections = [
     description: 'Arma nuestros momentos especiales y descubre mensajes románticos',
     icon: Puzzle,
     color: 'from-violet-500 via-purple-500 to-indigo-500',
-    gradient: 'from-pink-900/20 to-rose-900/20',
+    gradient: 'bg-gradient-to-br from-violet-500/15 via-purple-600/20 to-indigo-600/15 backdrop-blur-xl border-violet-400/20',
     emoji: '🧩'
   },
   {
@@ -51,7 +50,7 @@ const sections = [
     description: 'Las canciones que han marcado nuestra historia juntos',
     icon: Music,
     color: 'from-slate-500 via-purple-500 to-indigo-500',
-    gradient: 'from-pink-900/20 to-rose-900/20',
+    gradient: 'bg-gradient-to-br from-blue-600/15 via-indigo-700/20 to-slate-600/15 backdrop-blur-xl border-blue-400/20',
     emoji: '🎵'
   },
   {
@@ -60,21 +59,20 @@ const sections = [
     description: '7 años juntos... y una sorpresa especial esperándote',
     icon: Sparkles,
     color: 'from-yellow-500 via-orange-500 to-red-500',
-    gradient: 'from-pink-900/20 to-rose-900/20',
+    gradient: 'bg-gradient-to-br from-orange-500/15 via-yellow-600/20 to-red-500/15 backdrop-blur-xl border-orange-400/20',
     emoji: '✨'
   }
 ]
 
 export default function MainPage({ onOpenModal }: MainPageProps) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-rose-100 via-pink-50 to-orange-50 dark:from-slate-900 dark:via-purple-900 dark:to-slate-900 relative overflow-hidden">
-      <FloatingThemeToggle />
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
       {/* Background stars animation */}
       <div className="absolute inset-0">
         {[...Array(50)].map((_, i) => (
           <motion.div
             key={i}
-            className="absolute w-1 h-1 bg-orange-400 dark:bg-white rounded-full"
+            className="absolute w-1 h-1 bg-white rounded-full"
             style={{
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
@@ -102,12 +100,12 @@ export default function MainPage({ onOpenModal }: MainPageProps) {
           transition={{ duration: 1, delay: 0.5 }}
           className="text-center mb-8 sm:mb-12 md:mb-16"
         >
-          <h1 className="text-3xl sm:text-5xl md:text-7xl font-bold text-gray-800 dark:text-white mb-4 sm:mb-6">
-            <span className="bg-gradient-to-r from-orange-500 via-pink-500 to-rose-500 dark:from-yellow-300 dark:via-pink-300 dark:to-purple-300 bg-clip-text text-transparent">
+          <h1 className="text-3xl sm:text-5xl md:text-7xl font-bold text-white mb-4 sm:mb-6">
+            <span className="bg-gradient-to-r from-yellow-300 via-pink-300 to-purple-300 bg-clip-text text-transparent">
               Nuestra Aventura
             </span>
           </h1>
-          <p className="text-lg sm:text-xl md:text-2xl text-gray-600 dark:text-gray-200 max-w-3xl mx-auto leading-relaxed px-4">
+          <p className="text-lg sm:text-xl md:text-2xl text-gray-200 max-w-3xl mx-auto leading-relaxed px-4">
             7 años de amor, risas, aventuras y momentos inolvidables. 
             Explora cada capítulo de nuestra historia juntos.
           </p>
@@ -121,25 +119,36 @@ export default function MainPage({ onOpenModal }: MainPageProps) {
             return (
               <motion.div
                 key={section.id}
-                initial={{ opacity: 0, y: 50, scale: 0.9 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
+                initial={{ opacity: 0, y: 30, scale: 0.95, rotateY: -15 }}
+                animate={{ opacity: 1, y: 0, scale: 1, rotateY: 0 }}
                 transition={{ 
-                  duration: 0.8, 
-                  delay: 0.7 + index * 0.2,
+                  duration: 1.2, 
+                  delay: 0.7 + index * 0.25,
                   type: "spring",
-                  bounce: 0.1
+                  stiffness: 80,
+                  damping: 20,
+                  mass: 1.2
                 }}
                 whileHover={{ 
-                  scale: 1.05, 
-                  y: -10,
-                  transition: { duration: 0.3 }
+                  scale: 1.03, 
+                  y: -8,
+                  rotateY: 2,
+                  transition: { 
+                    duration: 0.6,
+                    type: "spring",
+                    stiffness: 300,
+                    damping: 25
+                  }
                 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => onOpenModal(section.id as any)}
+                whileTap={{ 
+                  scale: 0.98,
+                  transition: { duration: 0.3, type: "spring" }
+                }}
+                onClick={() => onOpenModal(section.id as 'timeline' | 'gallery' | 'quiz' | 'puzzle' | 'music' | 'finale')}
                 className="group cursor-pointer relative overflow-hidden"
               >
                 {/* Card Background */}
-                <div className={`relative bg-gradient-to-br from-white/80 to-rose-50/80 dark:${section.gradient} backdrop-blur-xl rounded-2xl sm:rounded-3xl p-6 sm:p-8 border border-rose-200/50 dark:border-white/10 shadow-2xl hover:shadow-3xl transition-all duration-500 hover:border-rose-300/70 dark:hover:border-white/30 min-h-[280px] sm:min-h-[300px] flex flex-col justify-between`}>
+                <div className={`relative ${section.gradient} rounded-2xl sm:rounded-3xl p-6 sm:p-8 border shadow-2xl hover:shadow-3xl transition-all duration-700 ease-out hover:border-opacity-60 min-h-[280px] sm:min-h-[300px] flex flex-col justify-between group-hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.4)]`}>
                   
                   {/* Background Pattern */}
                   <div className="absolute inset-0 opacity-5">
@@ -174,12 +183,12 @@ export default function MainPage({ onOpenModal }: MainPageProps) {
                     </div>
 
                     {/* Title */}
-                    <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 dark:text-white mb-3 sm:mb-4 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-gray-800 group-hover:to-gray-600 dark:group-hover:from-white dark:group-hover:to-gray-300 transition-all duration-300">
+                    <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-3 sm:mb-4 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-gray-300 transition-all duration-300">
                       {section.title}
                     </h3>
 
                     {/* Description */}
-                    <p className="text-gray-600 dark:text-gray-300 text-base sm:text-lg leading-relaxed mb-4 sm:mb-6">
+                    <p className="text-gray-300 text-base sm:text-lg leading-relaxed mb-4 sm:mb-6">
                       {section.description}
                     </p>
 
@@ -220,24 +229,24 @@ export default function MainPage({ onOpenModal }: MainPageProps) {
           transition={{ duration: 1, delay: 2 }}
           className="text-center mt-16"
         >
-          <p className="text-gray-500 dark:text-gray-400 text-lg">
+          <p className="text-gray-400 text-lg">
             Haz clic en cualquier tarjeta para comenzar la exploración
           </p>
           <div className="flex items-center justify-center space-x-2 mt-4">
             <motion.div
               animate={{ scale: [1, 1.2, 1] }}
               transition={{ duration: 2, repeat: Infinity }}
-              className="w-2 h-2 bg-pink-500 dark:bg-pink-400 rounded-full"
+              className="w-2 h-2 bg-pink-400 rounded-full"
             />
             <motion.div
               animate={{ scale: [1, 1.2, 1] }}
               transition={{ duration: 2, repeat: Infinity, delay: 0.2 }}
-              className="w-2 h-2 bg-purple-500 dark:bg-purple-400 rounded-full"
+              className="w-2 h-2 bg-purple-400 rounded-full"
             />
             <motion.div
               animate={{ scale: [1, 1.2, 1] }}
               transition={{ duration: 2, repeat: Infinity, delay: 0.4 }}
-              className="w-2 h-2 bg-blue-500 dark:bg-blue-400 rounded-full"
+              className="w-2 h-2 bg-blue-400 rounded-full"
             />
           </div>
         </motion.div>

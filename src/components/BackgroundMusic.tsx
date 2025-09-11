@@ -2,6 +2,13 @@
 
 import { useEffect, useRef } from 'react'
 
+interface YoutubePlayer {
+  setVolume: (volume: number) => void
+  playVideo: () => void
+  pauseVideo: () => void
+  destroy: () => void
+}
+
 interface BackgroundMusicProps {
   paused: boolean
 }
@@ -10,12 +17,12 @@ interface BackgroundMusicProps {
 // It loops the same video and keeps a low volume.
 export default function BackgroundMusic({ paused }: BackgroundMusicProps) {
   const containerRef = useRef<HTMLDivElement | null>(null)
-  const playerRef = useRef<any>(null)
+  const playerRef = useRef<YoutubePlayer | null>(null)
 
   // Load IFrame API once
   useEffect(() => {
     if (typeof window === 'undefined') return
-    const w = window as any
+    const w = window as Window & { YT?: any; onYouTubeIframeAPIReady?: () => void }
 
     const onYouTubeIframeAPIReady = () => {
       if (!containerRef.current || playerRef.current) return
@@ -33,7 +40,7 @@ export default function BackgroundMusic({ paused }: BackgroundMusicProps) {
           rel: 0,
         },
         events: {
-          onReady: (e: any) => {
+          onReady: (e: { target: YoutubePlayer }) => {
             try {
               e.target.setVolume(10) // volumen bajo
               if (!paused) e.target.playVideo()
@@ -58,7 +65,7 @@ export default function BackgroundMusic({ paused }: BackgroundMusicProps) {
       tag.src = 'https://www.youtube.com/iframe_api'
       document.body.appendChild(tag)
     }
-    (w as any).onYouTubeIframeAPIReady = onYouTubeIframeAPIReady
+    w.onYouTubeIframeAPIReady = onYouTubeIframeAPIReady
 
     return () => {
       try {
@@ -68,7 +75,7 @@ export default function BackgroundMusic({ paused }: BackgroundMusicProps) {
         }
       } catch {}
     }
-  }, [])
+  }, [paused])
 
   // Pause/Resume when prop changes
   useEffect(() => {
