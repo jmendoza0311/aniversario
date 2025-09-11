@@ -260,6 +260,7 @@ function TimelinePoint({ item, index, isHovered, onHover, onLeave, onImageClick,
           damping: 25,
           ease: [0.25, 0.46, 0.45, 0.94]
         }}
+        onClick={onImageClick}
       >
         <div className="relative overflow-hidden rounded-lg sm:rounded-xl bg-white/10 p-4 sm:p-6 backdrop-blur-sm transition-all duration-600 ease-out hover:bg-white/20 hover:shadow-2xl hover:shadow-pink-500/20">
           {/* Image */}
@@ -410,14 +411,6 @@ function NavigableModal({ item, currentIndex, isSequential, onClose, onNext, onP
               className="p-3 bg-black/30 hover:bg-black/50 rounded-full text-white transition-all duration-200 hover:scale-110"
             >
               <ChevronLeft className="h-6 w-6" />
-            </button>
-          )}
-          {!isSequential && (
-            <button
-              onClick={onClose}
-              className="p-3 bg-black/30 hover:bg-black/50 rounded-full text-white transition-all duration-200 hover:scale-110"
-            >
-              <X className="h-6 w-6" />
             </button>
           )}
           <button

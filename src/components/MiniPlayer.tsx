@@ -2,13 +2,14 @@
 
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAudioContext } from '../contexts/AudioContext'
-import { Play, Pause, SkipBack, SkipForward, Volume2, X, Music2 } from 'lucide-react'
+import { Play, Pause, SkipBack, SkipForward, Volume2, X, Music2, Minimize2, Maximize2 } from 'lucide-react'
 import { useState, useEffect } from 'react'
 
 export default function MiniPlayer() {
   const audioContext = useAudioContext()
   const [showVolumeSlider, setShowVolumeSlider] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
+  const [isMinimized, setIsMinimized] = useState(false)
 
   const {
     currentSongData,
@@ -58,6 +59,41 @@ export default function MiniPlayer() {
         exit={{ y: 100, opacity: 0 }}
         className="fixed bottom-4 right-4 z-50"
       >
+        {/* Vista minimizada súper compacta */}
+        <AnimatePresence>
+          {isMinimized && (
+            <motion.div
+              key="mini-compact"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              className="flex items-center justify-center"
+            >
+              <motion.button
+                onClick={() => setIsMinimized(false)}
+                className="w-12 h-12 sm:w-11 sm:h-11 rounded-full bg-black/50 backdrop-blur-xl border border-white/20 flex items-center justify-center shadow-xl"
+                whileHover={{ scale: 1.08 }}
+                whileTap={{ scale: 0.92 }}
+                aria-label="Expandir reproductor"
+                title={`${currentSongData.title} — ${currentSongData.artist}`}
+              >
+                {isLoading ? (
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                    className="h-5 w-5 border-2 border-white border-t-transparent rounded-full"
+                  />
+                ) : isPlaying ? (
+                  <Pause className="h-5 w-5 text-white" />
+                ) : (
+                  <Play className="h-5 w-5 text-white ml-0.5" />
+                )}
+              </motion.button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {!isMinimized && (
         <motion.div
           className={`bg-gradient-to-r ${currentSongData.color} backdrop-blur-xl rounded-2xl shadow-2xl border border-white/20 overflow-hidden transition-all duration-300 ${
             isExpanded ? 'w-96' : 'w-80'
@@ -87,6 +123,16 @@ export default function MiniPlayer() {
 
               {/* Botones de control superior */}
               <div className="flex items-center space-x-2">
+                {/* Botón minimizar a vista compacta */}
+                <motion.button
+                  onClick={() => setIsMinimized(true)}
+                  className="p-2 bg-white/20 hover:bg-white/30 rounded-xl transition-all duration-200"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  aria-label="Minimizar"
+                >
+                  <Minimize2 className="h-4 w-4 text-white" />
+                </motion.button>
                 {/* Botón expandir/contraer */}
                 <motion.button
                   onClick={() => setIsExpanded(!isExpanded)}
@@ -309,6 +355,7 @@ export default function MiniPlayer() {
             </div>
           )}
         </motion.div>
+        )}
       </motion.div>
     </AnimatePresence>
   )

@@ -189,17 +189,6 @@ export default function WelcomeScreen({ onEnter }: WelcomeScreenProps) {
           transition={{ duration: 1, delay: 4 }}
           className="absolute bottom-8 right-8"
         >
-          <Button
-            onClick={() => setMusicEnabled(!musicEnabled)}
-            variant="outline"
-            size="sm"
-          >
-            {musicEnabled ? (
-              <Volume2 className="h-4 w-4" />
-            ) : (
-              <VolumeX className="h-4 w-4" />
-            )}
-          </Button>
         </motion.div>
       </div>
 
