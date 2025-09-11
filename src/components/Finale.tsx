@@ -517,16 +517,17 @@ function VideoModal({ onClose }: VideoModalProps) {
               </span>
             </h2>
 
-            {/* Video placeholder */}
-            <div className="aspect-video bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl mb-6 flex items-center justify-center border border-white/10">
-              <div className="text-center text-white">
-                <div className="text-6xl mb-4">🎬</div>
-                <p className="text-xl font-semibold mb-2">Video Sorpresa</p>
-                <p className="text-gray-300">Aquí iría tu video especial</p>
-                <p className="text-sm text-gray-400 mt-2">
-                  Reemplaza esta sección con tu video romántico
-                </p>
-              </div>
+            {/* Video sorpresa */}
+            <div className="aspect-video rounded-2xl mb-6 overflow-hidden border border-white/10 shadow-2xl">
+              <video 
+                className="w-full h-full object-cover rounded-2xl"
+                controls
+                preload="metadata"
+                poster="/images/video-poster.jpg" // Opcional: puedes agregar una imagen de portada
+              >
+                <source src="/video/NUESTRO.mp4" type="video/mp4" />
+                Tu navegador no soporta la reproducción de video.
+              </video>
             </div>
 
             {/* Message below video */}
