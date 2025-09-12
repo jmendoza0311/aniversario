@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Dancing_Script } from "next/font/google";
 import "./globals.css";
 // import Header from "@/components/layout/Header";
 import { AudioProvider } from "@/contexts/AudioContext";
+import { BackgroundMusicProvider } from "@/contexts/BackgroundMusicContext";
 import MiniPlayer from "@/components/MiniPlayer";
 
 const geistSans = Geist({
@@ -35,14 +36,16 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${dancingScript.variable} antialiased`}
       >
-        <AudioProvider>
-          <main className="min-h-screen">
-            {children}
-          </main>
-          
-          {/* Mini reproductor global */}
-          <MiniPlayer />
-        </AudioProvider>
+        <BackgroundMusicProvider>
+          <AudioProvider>
+            <main className="min-h-screen">
+              {children}
+            </main>
+            
+            {/* Mini reproductor global */}
+            <MiniPlayer />
+          </AudioProvider>
+        </BackgroundMusicProvider>
       </body>
         </html>
   );

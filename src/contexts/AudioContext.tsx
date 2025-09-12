@@ -30,6 +30,10 @@ interface AudioContextType {
   isMiniPlayerVisible: boolean
   showMiniPlayer: () => void
   hideMiniPlayer: () => void
+  
+  // Callback para notificar cambios de reproducción
+  onPlaybackChange?: (isPlaying: boolean) => void
+  setOnPlaybackChange: (callback: (isPlaying: boolean) => void) => void
 }
 
 const AudioContext = createContext<AudioContextType | undefined>(undefined)
@@ -72,6 +76,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
   const [duration, setDuration] = useState(0)
   const [volume, setVolumeState] = useState(0.7)
   const [isMiniPlayerVisible, setIsMiniPlayerVisible] = useState(false)
+  const [onPlaybackChange, setOnPlaybackChange] = useState<((isPlaying: boolean) => void) | undefined>(undefined)
 
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const currentSongId = useRef<string | null>(null)
@@ -182,14 +187,28 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
       audio.addEventListener('ended', () => {
         setIsPlaying(false)
         setProgress(0)
+        // Notificar que terminó la canción del cancionero
+        if (onPlaybackChange) {
+          onPlaybackChange(false)
+        }
       })
 
       audio.addEventListener('play', () => {
         setIsPlaying(true)
         setIsMiniPlayerVisible(true) // Mostrar mini reproductor cuando empiece a reproducir
+        // Notificar que se está reproduciendo una canción del cancionero
+        if (onPlaybackChange) {
+          onPlaybackChange(true)
+        }
       })
       
-      audio.addEventListener('pause', () => setIsPlaying(false))
+      audio.addEventListener('pause', () => {
+        setIsPlaying(false)
+        // Notificar que se pausó la canción del cancionero
+        if (onPlaybackChange) {
+          onPlaybackChange(false)
+        }
+      })
 
       audio.addEventListener('error', () => {
         // Manejo de errores sin logging problemático
@@ -334,7 +353,9 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     previousSong,
     isMiniPlayerVisible,
     showMiniPlayer,
-    hideMiniPlayer
+    hideMiniPlayer,
+    onPlaybackChange,
+    setOnPlaybackChange
   }
 
   return (

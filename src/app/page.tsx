@@ -13,6 +13,7 @@ import Puzzle from '../components/Puzzle'
 import Music from '../components/Music'
 import Finale from '../components/Finale'
 import BackgroundMusic from '../components/BackgroundMusic'
+import MusicTimerIndicator from '../components/MusicTimerIndicator'
 
 type ModalType = 'timeline' | 'gallery' | 'quiz' | 'puzzle' | 'music' | 'finale' | null
 
@@ -49,18 +50,24 @@ export default function HomePage() {
     }
   }, [currentModal])
 
-  if (showWelcome) {
-    return <WelcomeScreen onEnter={handleEnter} />
-  }
-
   return (
     <LayoutGroup>
-      {/* Global background music - paused only on music section */}
-      <BackgroundMusic paused={currentModal === 'music'} />
-      {/* Main Page - mantener montado para evitar parpadeos al abrir modales */}
-      <div aria-hidden={!!currentModal} className={currentModal ? 'pointer-events-none' : ''}>
-        <MainPage onOpenModal={handleOpenModal} />
-      </div>
+      {/* Background music - siempre activo */}
+      <BackgroundMusic />
+      
+      {/* Timer indicator for background music */}
+      <MusicTimerIndicator />
+      
+      {showWelcome ? (
+        <WelcomeScreen onEnter={handleEnter} />
+      ) : (
+        <>
+          {/* Main Page - mantener montado para evitar parpadeos al abrir modales */}
+          <div aria-hidden={!!currentModal} className={currentModal ? 'pointer-events-none' : ''}>
+            <MainPage onOpenModal={handleOpenModal} />
+          </div>
+        </>
+      )}
 
       {/* Modal Navigation - shown when any modal is open */}
       <ModalNavigation 

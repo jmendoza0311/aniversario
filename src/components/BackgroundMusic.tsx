@@ -1,114 +1,241 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { useBackgroundMusic } from '../contexts/BackgroundMusicContext'
+import { useAudioContext } from '../contexts/AudioContext'
 
-interface YoutubePlayer {
-  setVolume: (volume: number) => void
-  playVideo: () => void
-  pauseVideo: () => void
-  destroy: () => void
-}
+export default function BackgroundMusic() {
+  const audioRef = useRef<HTMLAudioElement | null>(null)
+  const [isLoaded, setIsLoaded] = useState(false)
+  const [hasStarted, setHasStarted] = useState(false)
+  const [waitingForInteraction, setWaitingForInteraction] = useState(false)
+  const [hasUserInteracted, setHasUserInteracted] = useState(false)
+  const { isPaused, pauseBackgroundMusic, startTimer } = useBackgroundMusic()
+  const { setOnPlaybackChange } = useAudioContext()
 
-interface YouTubePlayerConfig {
-  width: string
-  height: string
-  videoId: string
-  playerVars: Record<string, number | string>
-  events: {
-    onReady: (event: { target: YoutubePlayer }) => void
-  }
-}
-
-interface BackgroundMusicProps {
-  paused: boolean
-}
-
-// Simple YouTube background player. It stays visually hidden but plays audio.
-// It loops the same video and keeps a low volume.
-export default function BackgroundMusic({ paused }: BackgroundMusicProps) {
-  const containerRef = useRef<HTMLDivElement | null>(null)
-  const playerRef = useRef<YoutubePlayer | null>(null)
-
-  // Load IFrame API once
+  // Inicializar el audio
   useEffect(() => {
     if (typeof window === 'undefined') return
-    const w = window as Window & { 
-      YT?: { 
-        Player: new (container: HTMLElement, config: YouTubePlayerConfig) => YoutubePlayer
-      }; 
-      onYouTubeIframeAPIReady?: () => void 
+
+    console.log('🎵 Inicializando música de fondo...')
+    const audio = new Audio()
+    audio.src = '/audio/MusicaFondo.mp3'
+    audio.loop = true
+    audio.volume = 0.3 // Volumen bajo para música de fondo
+    audio.preload = 'auto'
+    
+    audio.addEventListener('canplaythrough', () => {
+      console.log('🎵 Música de fondo cargada correctamente')
+      setIsLoaded(true)
+      // Intentar reproducir inmediatamente cuando esté completamente cargada
+      if (!hasStarted) {
+        audio.play().then(() => {
+          setHasStarted(true)
+          setHasUserInteracted(true)
+          console.log('✅ Música de fondo iniciada automáticamente al cargar')
+        }).catch(() => {
+          console.log('⚠️ No se pudo reproducir automáticamente al cargar')
+        })
+      }
+    })
+
+    audio.addEventListener('canplay', () => {
+      console.log('🎵 Música de fondo lista para reproducir')
+      if (!hasStarted) {
+        setIsLoaded(true)
+        // Intentar reproducir cuando esté lista
+        audio.play().then(() => {
+          setHasStarted(true)
+          setHasUserInteracted(true)
+          console.log('✅ Música de fondo iniciada automáticamente cuando estuvo lista')
+        }).catch(() => {
+          console.log('⚠️ No se pudo reproducir automáticamente cuando estuvo lista')
+        })
+      }
+    })
+
+    audio.addEventListener('loadeddata', () => {
+      console.log('🎵 Datos de música de fondo cargados')
+    })
+
+    audio.addEventListener('error', (e) => {
+      console.error('❌ Error al cargar la música de fondo:', e)
+    })
+
+    audio.addEventListener('play', () => {
+      console.log('🎵 Música de fondo iniciada')
+    })
+
+    audio.addEventListener('pause', () => {
+      console.log('⏸️ Música de fondo pausada')
+    })
+
+    audioRef.current = audio
+
+    // Intentar reproducir inmediatamente
+    const tryPlayImmediately = async () => {
+      try {
+        console.log('🎵 Intentando reproducir inmediatamente...')
+        await audio.play()
+        setHasStarted(true)
+        setIsLoaded(true)
+        setHasUserInteracted(true)
+        console.log('✅ Música de fondo iniciada inmediatamente')
+      } catch (error) {
+        console.log('⚠️ Reproducción inmediata falló, esperando carga completa...')
+        // Intentar múltiples veces con diferentes estrategias
+        setTimeout(() => tryPlayImmediately(), 100)
+        setTimeout(() => tryPlayImmediately(), 500)
+        setTimeout(() => tryPlayImmediately(), 1000)
+      }
     }
 
-    const onYouTubeIframeAPIReady = () => {
-      if (!containerRef.current || playerRef.current || !w.YT) return
-      playerRef.current = new w.YT.Player(containerRef.current, {
-        width: '0',
-        height: '0',
-        videoId: 'ilUEfmoUCv0',
-        playerVars: {
-          autoplay: 1,
-          controls: 0,
-          loop: 1,
-          playlist: 'ilUEfmoUCv0',
-          modestbranding: 1,
-          fs: 0,
-          rel: 0,
-        },
-        events: {
-          onReady: (e: { target: YoutubePlayer }) => {
-            try {
-              e.target.setVolume(10) // volumen bajo
-              if (!paused) e.target.playVideo()
-              else e.target.pauseVideo()
-            } catch {}
-          },
-        },
-      })
+    // Intentar reproducir inmediatamente
+    tryPlayImmediately()
+
+    // No limpiar el audio al desmontar para mantener la reproducción continua
+    return () => {
+      // Solo pausar si es necesario, pero no limpiar la referencia
+    }
+  }, [])
+
+  // Reproducir automáticamente cuando esté cargado
+  useEffect(() => {
+    if (!audioRef.current || !isLoaded || hasStarted) return
+
+    const playAudio = async () => {
+      try {
+        console.log('🎵 Reproduciendo música de fondo...')
+        await audioRef.current!.play()
+        setHasStarted(true)
+        setHasUserInteracted(true)
+        console.log('✅ Música de fondo iniciada exitosamente')
+      } catch (error) {
+        console.error('❌ Error al reproducir música de fondo:', error)
+        // Intentar múltiples veces antes de mostrar el indicador
+        setTimeout(() => {
+          if (!hasStarted) {
+            audioRef.current?.play().catch(() => {
+              // Solo mostrar indicador si realmente no se puede reproducir
+              if (!hasUserInteracted) {
+                setWaitingForInteraction(true)
+                const handleUserInteraction = async () => {
+                  try {
+                    await audioRef.current!.play()
+                    setHasStarted(true)
+                    setWaitingForInteraction(false)
+                    setHasUserInteracted(true)
+                    console.log('✅ Música de fondo iniciada después de interacción del usuario')
+                    document.removeEventListener('click', handleUserInteraction)
+                    document.removeEventListener('keydown', handleUserInteraction)
+                    document.removeEventListener('touchstart', handleUserInteraction)
+                  } catch (e) {
+                    console.error('❌ Error al reproducir después de interacción:', e)
+                  }
+                }
+                document.addEventListener('click', handleUserInteraction, { once: true })
+                document.addEventListener('keydown', handleUserInteraction, { once: true })
+                document.addEventListener('touchstart', handleUserInteraction, { once: true })
+              }
+            })
+          }
+        }, 2000)
+      }
     }
 
-    // If API already present
-    if (w.YT && w.YT.Player) {
-      onYouTubeIframeAPIReady()
-      return
+    // Pequeño delay para asegurar que el DOM esté listo
+    const timeoutId = setTimeout(playAudio, 100)
+    return () => clearTimeout(timeoutId)
+  }, [isLoaded, hasStarted, hasUserInteracted])
+
+  // Intentar reproducir automáticamente en cualquier interacción del usuario
+  useEffect(() => {
+    if (hasStarted || hasUserInteracted) return
+
+    const handleAnyInteraction = async () => {
+      if (audioRef.current && !hasStarted) {
+        try {
+          await audioRef.current.play()
+          setHasStarted(true)
+          setHasUserInteracted(true)
+          setWaitingForInteraction(false)
+          console.log('✅ Música de fondo iniciada por interacción del usuario')
+        } catch (error) {
+          console.log('⚠️ Aún no se puede reproducir automáticamente')
+        }
+      }
     }
 
-    // Inject script once
-    const tagId = 'youtube-iframe-api'
-    if (!document.getElementById(tagId)) {
-      const tag = document.createElement('script')
-      tag.id = tagId
-      tag.src = 'https://www.youtube.com/iframe_api'
-      document.body.appendChild(tag)
-    }
-    w.onYouTubeIframeAPIReady = onYouTubeIframeAPIReady
+    // Escuchar cualquier tipo de interacción
+    document.addEventListener('click', handleAnyInteraction, { once: true })
+    document.addEventListener('keydown', handleAnyInteraction, { once: true })
+    document.addEventListener('touchstart', handleAnyInteraction, { once: true })
+    document.addEventListener('mousemove', handleAnyInteraction, { once: true })
+    document.addEventListener('scroll', handleAnyInteraction, { once: true })
 
     return () => {
-      try {
-        if (playerRef.current) {
-          playerRef.current.destroy()
-          playerRef.current = null
-        }
-      } catch {}
+      document.removeEventListener('click', handleAnyInteraction)
+      document.removeEventListener('keydown', handleAnyInteraction)
+      document.removeEventListener('touchstart', handleAnyInteraction)
+      document.removeEventListener('mousemove', handleAnyInteraction)
+      document.removeEventListener('scroll', handleAnyInteraction)
     }
-  }, [paused])
+  }, [hasStarted, hasUserInteracted])
 
-  // Pause/Resume when prop changes
+  // Controlar pausa/reproducción
   useEffect(() => {
-    try {
-      if (!playerRef.current) return
-      if (paused) playerRef.current.pauseVideo()
-      else playerRef.current.playVideo()
-    } catch {}
-  }, [paused])
+    if (!audioRef.current || !isLoaded) return
+
+    if (isPaused) {
+      audioRef.current.pause()
+    } else if (hasStarted) {
+      audioRef.current.play().catch(console.warn)
+    }
+  }, [isPaused, isLoaded, hasStarted])
+
+  // Configurar callback para escuchar cambios del reproductor del cancionero
+  useEffect(() => {
+    const handlePlaybackChange = (isPlaying: boolean) => {
+      console.log('🎵 Cambio de reproducción del cancionero:', isPlaying)
+      if (isPlaying) {
+        // Si se está reproduciendo una canción del cancionero, pausar música de fondo
+        console.log('⏸️ Pausando música de fondo por canción del cancionero')
+        pauseBackgroundMusic()
+      } else {
+        // Si se pausó o detuvo la canción del cancionero, iniciar timer de 10 segundos
+        console.log('⏰ Iniciando timer de 10 segundos para reanudar música de fondo')
+        startTimer()
+      }
+    }
+
+    setOnPlaybackChange(() => handlePlaybackChange)
+
+    return () => {
+      setOnPlaybackChange(() => {})
+    }
+  }, [pauseBackgroundMusic, startTimer, setOnPlaybackChange])
 
   return (
-    <div
-      aria-hidden
-      style={{ position: 'fixed', width: 0, height: 0, opacity: 0, pointerEvents: 'none' }}
-    >
-      <div ref={containerRef} />
-    </div>
+    <>
+      <div
+        aria-hidden
+        style={{ position: 'fixed', width: 0, height: 0, opacity: 0, pointerEvents: 'none' }}
+      >
+        {/* Elemento de audio invisible */}
+        <audio ref={audioRef} />
+      </div>
+      
+      {/* Indicador muy sutil de que la música está esperando interacción - solo como último recurso */}
+      {waitingForInteraction && !hasStarted && (
+        <div className="fixed bottom-4 right-4 z-50 opacity-0 pointer-events-none">
+          <div className="bg-black/40 backdrop-blur-sm rounded-full px-2 py-1 border border-white/10 shadow-lg">
+            <div className="flex items-center space-x-1">
+              <div className="w-1 h-1 bg-purple-400 rounded-full animate-pulse" />
+              <span className="text-white text-xs opacity-0">Música lista</span>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   )
 }
-
-
