@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Play, Heart, Sparkles, X } from 'lucide-react'
+import { useAudioContext } from '../contexts/AudioContext'
 
 interface Particle {
   id: number
@@ -32,6 +33,7 @@ export default function Finale() {
   const [showSecretButton, setShowSecretButton] = useState(false)
   const [showVideoModal, setShowVideoModal] = useState(false)
   const [messagePhase, setMessagePhase] = useState(0)
+  const { onPlaybackChange } = useAudioContext()
 
   // Start the finale sequence
   useEffect(() => {
@@ -471,13 +473,44 @@ interface VideoModalProps {
 }
 
 function VideoModal({ onClose }: VideoModalProps) {
+  const { onPlaybackChange } = useAudioContext()
+
+  const handleVideoPlay = () => {
+    // Notificar que se está reproduciendo contenido (igual que el cancionero)
+    if (onPlaybackChange) {
+      onPlaybackChange(true)
+    }
+  }
+
+  const handleVideoPause = () => {
+    // Notificar que se pausó el contenido (igual que el cancionero)
+    if (onPlaybackChange) {
+      onPlaybackChange(false)
+    }
+  }
+
+  const handleVideoEnded = () => {
+    // Notificar que terminó el contenido (igual que el cancionero)
+    if (onPlaybackChange) {
+      onPlaybackChange(false)
+    }
+  }
+
+  const handleClose = () => {
+    // Asegurar que se notifique que se detuvo el contenido al cerrar
+    if (onPlaybackChange) {
+      onPlaybackChange(false)
+    }
+    onClose()
+  }
+
   return (
     <motion.div
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      onClick={onClose}
+      onClick={handleClose}
     >
       {/* Backdrop */}
       <motion.div
@@ -498,7 +531,7 @@ function VideoModal({ onClose }: VideoModalProps) {
       >
         {/* Close button */}
         <button
-          onClick={onClose}
+          onClick={handleClose}
           className="absolute top-6 right-6 z-20 p-3 bg-black/20 hover:bg-black/40 rounded-full text-white transition-all duration-200 hover:scale-110"
         >
           <X className="h-6 w-6" />
@@ -524,6 +557,9 @@ function VideoModal({ onClose }: VideoModalProps) {
                 controls
                 preload="metadata"
                 poster="/images/video-poster.jpg" // Opcional: puedes agregar una imagen de portada
+                onPlay={handleVideoPlay}
+                onPause={handleVideoPause}
+                onEnded={handleVideoEnded}
               >
                 <source src="/video/NUESTRO.mp4" type="video/mp4" />
                 Tu navegador no soporta la reproducción de video.
