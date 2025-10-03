@@ -10,7 +10,7 @@ export default function BackgroundMusic() {
   const [hasStarted, setHasStarted] = useState(false)
   const [waitingForInteraction, setWaitingForInteraction] = useState(false)
   const [hasUserInteracted, setHasUserInteracted] = useState(false)
-  const { isPaused, pauseBackgroundMusic, startTimer } = useBackgroundMusic()
+  const { isPaused, volume, pauseBackgroundMusic, startTimer } = useBackgroundMusic()
   const { setOnPlaybackChange } = useAudioContext()
 
   // Inicializar el audio
@@ -21,7 +21,7 @@ export default function BackgroundMusic() {
     const audio = new Audio()
     audio.src = '/audio/MusicaFondo.mp3'
     audio.loop = true
-    audio.volume = 0.3 // Volumen bajo para música de fondo
+    audio.volume = volume // Usar volumen del contexto
     audio.preload = 'auto'
     
     audio.addEventListener('canplaythrough', () => {
@@ -181,6 +181,13 @@ export default function BackgroundMusic() {
       document.removeEventListener('scroll', handleAnyInteraction)
     }
   }, [hasStarted, hasUserInteracted])
+
+  // Actualizar volumen cuando cambie
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = volume
+    }
+  }, [volume])
 
   // Controlar pausa/reproducción
   useEffect(() => {

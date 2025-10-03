@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { photoData, categories, Photo } from '../data/galleryData'
-import { X, Heart, Calendar, MessageCircle } from 'lucide-react'
+import { X, Heart, Calendar, MessageCircle, ChevronLeft, ChevronRight } from 'lucide-react'
 
 export default function Gallery() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
@@ -120,7 +120,9 @@ export default function Gallery() {
           {selectedPhoto && (
             <PhotoLightbox
               photo={selectedPhoto}
+              photos={filteredPhotos}
               onClose={() => setSelectedPhoto(null)}
+              onNavigate={setSelectedPhoto}
             />
           )}
         </AnimatePresence>
@@ -167,7 +169,7 @@ function PhotoCard({ photo, onClick }: PhotoCardProps) {
       onClick={onClick}
     >
       {/* Photo with aspect ratio */}
-      <div 
+      <div
         className="w-full bg-gradient-to-br from-gray-300 to-gray-600 relative overflow-hidden"
         style={{ aspectRatio: `${photo.width} / ${photo.height}` }}
       >
@@ -177,26 +179,7 @@ function PhotoCard({ photo, onClick }: PhotoCardProps) {
           alt={photo.alt}
           className="w-full h-full object-cover"
           loading="lazy"
-          onError={(e) => {
-            // Fallback to placeholder if image fails to load
-            const target = e.target as HTMLImageElement;
-            target.style.display = 'none';
-            const placeholder = target.nextElementSibling as HTMLElement;
-            if (placeholder) placeholder.style.display = 'flex';
-          }}
         />
-        
-        {/* Placeholder content (hidden by default) */}
-        <div className="absolute inset-0 flex items-center justify-center" style={{ display: 'none' }}>
-          <div className="text-center text-gray-600">
-            <div className="text-4xl mb-2">
-              {
-               photo.category === 'cumpleanos' ? '🎂' :
-               photo.category === 'selfies' ? '🤳' : '⭐'}
-            </div>
-            <p className="text-sm font-medium">{photo.title}</p>
-          </div>
-        </div>
         
         {/* Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300" />
@@ -232,10 +215,39 @@ function PhotoCard({ photo, onClick }: PhotoCardProps) {
 
 interface PhotoLightboxProps {
   photo: Photo
+  photos: Photo[]
   onClose: () => void
+  onNavigate: (photo: Photo) => void
 }
 
-function PhotoLightbox({ photo, onClose }: PhotoLightboxProps) {
+function PhotoLightbox({ photo, photos, onClose, onNavigate }: PhotoLightboxProps) {
+  const currentIndex = photos.findIndex(p => p.id === photo.id)
+  const hasPrevious = currentIndex > 0
+  const hasNext = currentIndex < photos.length - 1
+
+  const goToPrevious = () => {
+    if (hasPrevious) {
+      onNavigate(photos[currentIndex - 1])
+    }
+  }
+
+  const goToNext = () => {
+    if (hasNext) {
+      onNavigate(photos[currentIndex + 1])
+    }
+  }
+
+  // Keyboard navigation
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'ArrowLeft') {
+      goToPrevious()
+    } else if (e.key === 'ArrowRight') {
+      goToNext()
+    } else if (e.key === 'Escape') {
+      onClose()
+    }
+  }
+
   return (
     <motion.div
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
@@ -243,6 +255,8 @@ function PhotoLightbox({ photo, onClose }: PhotoLightboxProps) {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       onClick={onClose}
+      onKeyDown={handleKeyDown}
+      tabIndex={0}
     >
       {/* Backdrop */}
       <motion.div
@@ -252,6 +266,33 @@ function PhotoLightbox({ photo, onClose }: PhotoLightboxProps) {
         exit={{ opacity: 0 }}
       />
 
+      {/* Navigation Arrows */}
+      {hasPrevious && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation()
+            goToPrevious()
+          }}
+          className="absolute left-4 z-20 p-4 bg-black/40 hover:bg-black/60 rounded-full text-white transition-all duration-200 hover:scale-110"
+          aria-label="Imagen anterior"
+        >
+          <ChevronLeft className="h-8 w-8" />
+        </button>
+      )}
+
+      {hasNext && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation()
+            goToNext()
+          }}
+          className="absolute right-4 z-20 p-4 bg-black/40 hover:bg-black/60 rounded-full text-white transition-all duration-200 hover:scale-110"
+          aria-label="Imagen siguiente"
+        >
+          <ChevronRight className="h-8 w-8" />
+        </button>
+      )}
+
       {/* Modal Content */}
       <motion.div
         className="relative z-10 max-w-6xl w-full max-h-[95vh] bg-white/5 backdrop-blur-xl rounded-3xl overflow-hidden shadow-2xl border border-white/10"
@@ -260,6 +301,7 @@ function PhotoLightbox({ photo, onClose }: PhotoLightboxProps) {
         exit={{ scale: 0.8, opacity: 0, y: 50 }}
         transition={{ type: "spring", bounce: 0.1 }}
         onClick={(e) => e.stopPropagation()}
+        key={photo.id}
       >
         {/* Close Button */}
         <button
@@ -271,39 +313,16 @@ function PhotoLightbox({ photo, onClose }: PhotoLightboxProps) {
 
         <div className="grid lg:grid-cols-2 gap-0 h-full min-h-[600px]">
           {/* Image Side */}
-          <div className="relative overflow-hidden bg-gradient-to-br from-gray-300 to-gray-600 flex items-center justify-center">
+          <div className="relative overflow-hidden bg-black flex items-center justify-center">
             {/* Actual image */}
             <img
               src={photo.src}
               alt={photo.alt}
-              className="w-full h-full object-cover"
-              onError={(e) => {
-                // Fallback to placeholder if image fails to load
-                const target = e.target as HTMLImageElement;
-                target.style.display = 'none';
-                const placeholder = target.nextElementSibling as HTMLElement;
-                if (placeholder) placeholder.style.display = 'flex';
-              }}
+              className="w-full h-full object-contain"
             />
-            
-            {/* Placeholder content (hidden by default) */}
-            <div className="text-center text-gray-600" style={{ display: 'none' }}>
-              <div className="text-8xl mb-4">
-                {
-                 photo.category === 'cumpleanos' ? '🎂' :
-                 photo.category === 'selfies' ? '🤳' : '⭐'}
-              </div>
-              <p className="text-2xl font-semibold">{photo.title}</p>
-              <p className="text-lg opacity-75 mt-2">{photo.date}</p>
-            </div>
-            
+
             {/* Decorative overlay */}
-            <div className="absolute inset-0 bg-gradient-to-br from-transparent via-white/5 to-black/20" />
-            
-            {/* Category badge */}
-            <div className="absolute top-6 left-6 px-4 py-2 bg-black/30 backdrop-blur-sm rounded-full text-white font-semibold">
-              {categories.find(c => c.id === photo.category)?.icon} {categories.find(c => c.id === photo.category)?.label}
-            </div>
+            <div className="absolute inset-0 bg-gradient-to-br from-transparent via-white/5 to-black/20 pointer-events-none" />
           </div>
 
           {/* Content Side */}

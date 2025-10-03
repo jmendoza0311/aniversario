@@ -66,7 +66,7 @@ const sections = [
 
 export default function MainPage({ onOpenModal }: MainPageProps) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-100 to-pink-200 dark:from-slate-900 dark:via-purple-900 dark:to-slate-900 relative overflow-hidden">
       {/* Background stars animation */}
       <div className="absolute inset-0">
         {[...Array(50)].map((_, i) => (
@@ -100,13 +100,13 @@ export default function MainPage({ onOpenModal }: MainPageProps) {
           transition={{ duration: 1, delay: 0.5 }}
           className="text-center mb-8 sm:mb-12 md:mb-16"
         >
-          <h1 className="text-3xl sm:text-5xl md:text-7xl font-bold text-white mb-4 sm:mb-6">
-            <span className="bg-gradient-to-r from-yellow-300 via-pink-300 to-purple-300 bg-clip-text text-transparent">
+          <h1 className="text-3xl sm:text-5xl md:text-7xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6">
+            <span className="bg-gradient-to-r from-yellow-400 via-pink-400 to-purple-500 dark:from-yellow-300 dark:via-pink-300 dark:to-purple-300 bg-clip-text text-transparent">
               Nuestra Aventura
             </span>
           </h1>
-          <p className="text-lg sm:text-xl md:text-2xl text-gray-200 max-w-3xl mx-auto leading-relaxed px-4">
-            7 años de amor, risas, aventuras y momentos inolvidables. 
+          <p className="text-lg sm:text-xl md:text-2xl text-gray-700 dark:text-gray-200 max-w-3xl mx-auto leading-relaxed px-4">
+            7 años de amor, risas, aventuras y momentos inolvidables.
             Explora cada capítulo de nuestra historia juntos.
           </p>
         </motion.div>
@@ -183,12 +183,12 @@ export default function MainPage({ onOpenModal }: MainPageProps) {
                     </div>
 
                     {/* Title */}
-                    <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-3 sm:mb-4 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-gray-300 transition-all duration-300">
+                    <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 dark:text-white mb-3 sm:mb-4 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-gray-800 dark:group-hover:from-white group-hover:to-gray-600 dark:group-hover:to-gray-300 transition-all duration-300">
                       {section.title}
                     </h3>
 
                     {/* Description */}
-                    <p className="text-gray-300 text-base sm:text-lg leading-relaxed mb-4 sm:mb-6">
+                    <p className="text-gray-600 dark:text-gray-300 text-base sm:text-lg leading-relaxed mb-4 sm:mb-6">
                       {section.description}
                     </p>
 

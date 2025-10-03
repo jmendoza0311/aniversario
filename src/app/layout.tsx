@@ -4,6 +4,7 @@ import "./globals.css";
 // import Header from "@/components/layout/Header";
 import { AudioProvider } from "@/contexts/AudioContext";
 import { BackgroundMusicProvider } from "@/contexts/BackgroundMusicContext";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 import MiniPlayer from "@/components/MiniPlayer";
 
 const geistSans = Geist({
@@ -36,16 +37,18 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${dancingScript.variable} antialiased`}
       >
-        <BackgroundMusicProvider>
-          <AudioProvider>
-            <main className="min-h-screen">
-              {children}
-            </main>
-            
-            {/* Mini reproductor global */}
-            <MiniPlayer />
-          </AudioProvider>
-        </BackgroundMusicProvider>
+        <ThemeProvider>
+          <BackgroundMusicProvider>
+            <AudioProvider>
+              <main className="min-h-screen">
+                {children}
+              </main>
+
+              {/* Mini reproductor global */}
+              <MiniPlayer />
+            </AudioProvider>
+          </BackgroundMusicProvider>
+        </ThemeProvider>
       </body>
         </html>
   );

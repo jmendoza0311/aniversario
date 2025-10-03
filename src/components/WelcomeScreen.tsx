@@ -60,7 +60,7 @@ export default function WelcomeScreen({ onEnter }: WelcomeScreenProps) {
   }
 
   return (
-    <div className="relative h-screen overflow-hidden bg-gradient-to-b from-slate-900 via-purple-900 to-black">
+    <div className="relative h-screen overflow-hidden bg-gradient-to-b from-pink-50 via-purple-100 to-pink-200 dark:from-slate-900 dark:via-purple-900 dark:to-black">
       {/* Starry Sky Background */}
       <div className="absolute inset-0">
         {stars.map(star => (
@@ -115,12 +115,12 @@ export default function WelcomeScreen({ onEnter }: WelcomeScreenProps) {
           }}
           className="mb-8 sm:mb-12"
         >
-          <h1 className="mb-4 text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold text-white">
+          <h1 className="mb-4 text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold text-gray-900 dark:text-white">
             <motion.span
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 1, delay: 1 }}
-              className="block bg-gradient-to-r from-yellow-300 via-pink-300 to-purple-300 bg-clip-text text-transparent"
+              className="block bg-gradient-to-r from-yellow-400 via-pink-400 to-purple-500 dark:from-yellow-300 dark:via-pink-300 dark:to-purple-300 bg-clip-text text-transparent"
             >
               Hace 7 años
             </motion.span>
@@ -128,15 +128,15 @@ export default function WelcomeScreen({ onEnter }: WelcomeScreenProps) {
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ 
-              duration: 2, 
+            transition={{
+              duration: 2,
               delay: 2.5,
               type: "spring",
               stiffness: 50,
               damping: 25,
               ease: [0.25, 0.46, 0.45, 0.94]
             }}
-            className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-gray-200"
+            className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-gray-700 dark:text-gray-200"
           >
             comenzó nuestra aventura...
           </motion.p>
@@ -158,7 +158,7 @@ export default function WelcomeScreen({ onEnter }: WelcomeScreenProps) {
           <Button
             onClick={handleEnter}
             disabled={isEntering}
-            className="relative overflow-hidden bg-gradient-to-r from-pink-500 to-purple-600 px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold text-white shadow-2xl hover:from-pink-600 hover:to-purple-700 hover:shadow-pink-500/25 disabled:opacity-50 touch-manipulation"
+            className="relative overflow-hidden bg-gradient-to-r from-pink-400 to-purple-500 dark:from-pink-500 dark:to-purple-600 px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold text-white shadow-2xl hover:from-pink-500 hover:to-purple-600 dark:hover:from-pink-600 dark:hover:to-purple-700 hover:shadow-pink-500/25 disabled:opacity-50 touch-manipulation"
           >
             <motion.span
               animate={isEntering ? { x: [0, 20, 0] } : {}}

@@ -172,7 +172,7 @@ export const photoData: Photo[] = [
   {
     id: "cumple-2025",
     src: "/images/GalleryMoments/Cumpleanos/cumpleanos3ago2025.jpeg",
-    alt: "Cumpleaños vintage 2024",
+    alt: "Cumpleaños vintage 2025",
     category: "cumpleanos",
     width: 350,
     height: 450,
@@ -182,15 +182,15 @@ export const photoData: Photo[] = [
       "La felicidad que se siente celebrar un año mas a tu lado no tiene precio. 💜🎉",
   },
   {
-    id: "cumple-2025-soon",
-    src: "/images/GalleryMoments/Cumpleanos/.jpeg",
-    alt: "Cumpleaños vintage 2025",
+    id: "cumple-2025-23",
+    src: "/images/GalleryMoments/Cumpleanos/cumple23.jpeg",
+    alt: "Cumpleaños 2025",
     category: "cumpleanos",
     width: 350,
     height: 450,
     date: "26 de Septiembre, 2025",
-    title: "Tu Cumpleaños 2025 cooming soon",
-    hiddenMessage: "Cooming Soon",
+    title: "Tu Cumpleaños 2025",
+    hiddenMessage: "Con 23 regalos te quise sorprender, porque mereces el cielo, la tierra y el mar, y si me es posible te bajare la luna tambien. 💜🎉",
   },
 
   //#ESPECIALES
@@ -224,7 +224,7 @@ export const photoData: Photo[] = [
     category: "especiales",
     width: 350,
     height: 450,
-    date: "",
+    date: "Algun 23 especial",
     title: "Regalos Especiales",
     hiddenMessage: "Regalos especiales, dia especial. Te amo. 💜",
   },
@@ -345,7 +345,7 @@ export const photoData: Photo[] = [
     category: "especiales",
     width: 350,
     height: 450,
-    date: "1 de Septiembre, 2022",
+    date: "31 de Octubre, 2022",
     title: "Especiales 14",
     hiddenMessage:
       "Halloween con mi Wario.💜",

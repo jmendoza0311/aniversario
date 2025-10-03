@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { timelineData, TimelineItem } from '../data/timelineData'
 import { X, ChevronLeft, ChevronRight } from 'lucide-react'
-import Image from 'next/image'
 
 export default function Timeline() {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
@@ -309,12 +308,10 @@ function TimelinePoint({ item, index, isHovered, onHover, onLeave, onImageClick,
                 />
               ) : null}
               {(!item.video || item.video.trim() === '') ? (
-                <Image
+                <img
                   src={item.image}
                   alt={`${item.title} - ${item.year}`}
-                  fill
-                  className="object-cover transition-all duration-300"
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  className="absolute inset-0 w-full h-full object-cover transition-all duration-300"
                 />
               ) : null}
               {/* Click indicator */}
@@ -376,6 +373,20 @@ interface NavigableModalProps {
 }
 
 function NavigableModal({ item, currentIndex, isSequential, onClose, onNext, onPrev }: NavigableModalProps) {
+  const hasPrevious = currentIndex > 0
+  const hasNext = currentIndex < timelineData.length - 1
+
+  // Keyboard navigation
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'ArrowLeft' && hasPrevious) {
+      onPrev()
+    } else if (e.key === 'ArrowRight' && hasNext) {
+      onNext()
+    } else if (e.key === 'Escape') {
+      onClose()
+    }
+  }
+
   console.log('ImageModal rendering:', item.year, item.title)
   return (
     <motion.div
@@ -385,6 +396,8 @@ function NavigableModal({ item, currentIndex, isSequential, onClose, onNext, onP
       exit={{ opacity: 0 }}
       transition={{ duration: 0.3 }}
       onClick={isSequential ? undefined : onClose}
+      onKeyDown={handleKeyDown}
+      tabIndex={0}
     >
       {/* Backdrop */}
       <motion.div
@@ -394,6 +407,33 @@ function NavigableModal({ item, currentIndex, isSequential, onClose, onNext, onP
         exit={{ opacity: 0 }}
       />
 
+      {/* Navigation Arrows - Always visible when available */}
+      {hasPrevious && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation()
+            onPrev()
+          }}
+          className="absolute left-4 z-20 p-4 bg-black/40 hover:bg-black/60 rounded-full text-white transition-all duration-200 hover:scale-110"
+          aria-label="Año anterior"
+        >
+          <ChevronLeft className="h-8 w-8" />
+        </button>
+      )}
+
+      {hasNext && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation()
+            onNext()
+          }}
+          className="absolute right-4 z-20 p-4 bg-black/40 hover:bg-black/60 rounded-full text-white transition-all duration-200 hover:scale-110"
+          aria-label="Año siguiente"
+        >
+          <ChevronRight className="h-8 w-8" />
+        </button>
+      )}
+
       {/* Modal Content */}
       <motion.div
         className="relative z-10 w-[95vw] h-[95vh] bg-white/10 backdrop-blur-lg rounded-2xl overflow-hidden shadow-2xl"
@@ -402,28 +442,15 @@ function NavigableModal({ item, currentIndex, isSequential, onClose, onNext, onP
         exit={{ scale: 0.8, opacity: 0 }}
         transition={{ duration: 0.3, type: "spring", bounce: 0.1 }}
         onClick={(e) => e.stopPropagation()}
+        key={item.year}
       >
-        {/* Navigation Controls */}
-        <div className="absolute top-4 right-4 z-20 flex gap-2">
-          {isSequential && currentIndex > 0 && (
-            <button
-              onClick={onPrev}
-              className="p-3 bg-black/30 hover:bg-black/50 rounded-full text-white transition-all duration-200 hover:scale-110"
-            >
-              <ChevronLeft className="h-6 w-6" />
-            </button>
-          )}
-          <button
-            onClick={isSequential ? onNext : onClose}
-            className="p-3 bg-black/30 hover:bg-black/50 rounded-full text-white transition-all duration-200 hover:scale-110"
-          >
-            {isSequential && currentIndex < timelineData.length - 1 ? (
-              <ChevronRight className="h-6 w-6" />
-            ) : (
-              <X className="h-6 w-6" />
-            )}
-          </button>
-        </div>
+        {/* Close Button */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 z-20 p-3 bg-black/30 hover:bg-black/50 rounded-full text-white transition-all duration-200 hover:scale-110"
+        >
+          <X className="h-6 w-6" />
+        </button>
 
         {/* Progress Indicator */}
         {isSequential && (
@@ -462,13 +489,10 @@ function NavigableModal({ item, currentIndex, isSequential, onClose, onNext, onP
                 }}
               />
             ) : (
-              <Image
+              <img
                 src={item.image}
                 alt={`${item.title} - ${item.year}`}
-                fill
-                className="object-contain"
-                sizes="(max-width: 1024px) 100vw, 50vw"
-                priority
+                className="absolute inset-0 w-full h-full object-contain"
               />
             )}
           </motion.div>

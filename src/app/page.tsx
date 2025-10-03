@@ -1,19 +1,36 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import dynamic from 'next/dynamic'
 import { motion, LayoutGroup } from 'framer-motion'
 import WelcomeScreen from '../components/WelcomeScreen'
 import MainPage from '../components/MainPage'
 import ModalNavigation from '../components/ModalNavigation'
 import ModalWrapper from '../components/ModalWrapper'
-import Timeline from '../components/Timeline'
-import Gallery from '../components/Gallery'
-import Quiz from '../components/Quiz'
-import Puzzle from '../components/Puzzle'
-import Music from '../components/Music'
-import Finale from '../components/Finale'
 import BackgroundMusic from '../components/BackgroundMusic'
 import MusicTimerIndicator from '../components/MusicTimerIndicator'
+import DaysCounter from '../components/DaysCounter'
+import ThemeToggle from '../components/ThemeToggle'
+
+// Lazy load modal components
+const Timeline = dynamic(() => import('../components/Timeline'), {
+  loading: () => <div className="flex items-center justify-center min-h-screen"><div className="text-white text-xl">Cargando...</div></div>
+})
+const Gallery = dynamic(() => import('../components/Gallery'), {
+  loading: () => <div className="flex items-center justify-center min-h-screen"><div className="text-white text-xl">Cargando...</div></div>
+})
+const Quiz = dynamic(() => import('../components/Quiz'), {
+  loading: () => <div className="flex items-center justify-center min-h-screen"><div className="text-white text-xl">Cargando...</div></div>
+})
+const Puzzle = dynamic(() => import('../components/Puzzle'), {
+  loading: () => <div className="flex items-center justify-center min-h-screen"><div className="text-white text-xl">Cargando...</div></div>
+})
+const Music = dynamic(() => import('../components/Music'), {
+  loading: () => <div className="flex items-center justify-center min-h-screen"><div className="text-white text-xl">Cargando...</div></div>
+})
+const Finale = dynamic(() => import('../components/Finale'), {
+  loading: () => <div className="flex items-center justify-center min-h-screen"><div className="text-white text-xl">Cargando...</div></div>
+})
 
 type ModalType = 'timeline' | 'gallery' | 'quiz' | 'puzzle' | 'music' | 'finale' | null
 
@@ -54,10 +71,16 @@ export default function HomePage() {
     <LayoutGroup>
       {/* Background music - siempre activo */}
       <BackgroundMusic />
-      
+
       {/* Timer indicator for background music */}
       <MusicTimerIndicator />
-      
+
+      {/* Theme Toggle - siempre visible */}
+      <ThemeToggle />
+
+      {/* Days Counter - solo visible después del welcome screen */}
+      {!showWelcome && <DaysCounter />}
+
       {showWelcome ? (
         <WelcomeScreen onEnter={handleEnter} />
       ) : (

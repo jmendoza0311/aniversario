@@ -3,13 +3,16 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { songs, Song } from '../data/musicData'
-import { Play, Pause, ExternalLink, Heart, Music2, Volume2, AlertCircle } from 'lucide-react'
+import { Play, Pause, ExternalLink, Heart, Music2, Volume2, VolumeX, AlertCircle } from 'lucide-react'
 import { useAudioContext } from '../contexts/AudioContext'
+import { useBackgroundMusic } from '../contexts/BackgroundMusicContext'
 
 export default function Music() {
   const [selectedSong, setSelectedSong] = useState<Song | null>(null)
-  
+  const [showVolumeControl, setShowVolumeControl] = useState(false)
+
   const audioContext = useAudioContext()
+  const { volume, setVolume } = useBackgroundMusic()
 
   const handlePlaySong = (songId: string) => {
     const song = songs.find(s => s.id === songId)
@@ -45,7 +48,56 @@ export default function Music() {
           </p>
         </motion.div>
 
+        {/* Background Music Volume Control */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="max-w-4xl mx-auto mb-8 px-4"
+        >
+          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20">
+            <button
+              onClick={() => setShowVolumeControl(!showVolumeControl)}
+              className="w-full flex items-center justify-between text-white hover:text-purple-300 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                {volume === 0 ? (
+                  <VolumeX className="h-5 w-5" />
+                ) : (
+                  <Volume2 className="h-5 w-5" />
+                )}
+                <span className="font-semibold">Música de Fondo</span>
+              </div>
+              <span className="text-sm text-purple-200">
+                {Math.round(volume * 100)}%
+              </span>
+            </button>
 
+            <AnimatePresence>
+              {showVolumeControl && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="overflow-hidden"
+                >
+                  <div className="pt-4 flex items-center gap-4">
+                    <VolumeX className="h-4 w-4 text-white/60" />
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      value={volume * 100}
+                      onChange={(e) => setVolume(Number(e.target.value) / 100)}
+                      className="flex-1 h-2 bg-white/20 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-purple-400 [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-purple-400 [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer"
+                    />
+                    <Volume2 className="h-4 w-4 text-white/60" />
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </motion.div>
 
         {/* Songs List */}
         <div className="grid gap-6 max-w-4xl mx-auto">

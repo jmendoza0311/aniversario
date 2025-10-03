@@ -6,10 +6,12 @@ interface BackgroundMusicContextType {
   isPaused: boolean
   isTimerActive: boolean
   timeRemaining: number
+  volume: number
   pauseBackgroundMusic: () => void
   resumeBackgroundMusic: () => void
   startTimer: () => void
   cancelTimer: () => void
+  setVolume: (volume: number) => void
 }
 
 const BackgroundMusicContext = createContext<BackgroundMusicContextType | undefined>(undefined)
@@ -18,7 +20,14 @@ export function BackgroundMusicProvider({ children }: { children: React.ReactNod
   const [isPaused, setIsPaused] = useState(false)
   const [isTimerActive, setIsTimerActive] = useState(false)
   const [timeRemaining, setTimeRemaining] = useState(10) // 10 segundos
+  const [volume, setVolumeState] = useState(0.3) // Volumen inicial 30%
   const timerRef = useRef<NodeJS.Timeout | null>(null)
+
+  const setVolume = (newVolume: number) => {
+    const clampedVolume = Math.max(0, Math.min(1, newVolume))
+    setVolumeState(clampedVolume)
+    console.log('🔊 Volumen de música de fondo cambiado a:', (clampedVolume * 100).toFixed(0) + '%')
+  }
 
   const pauseBackgroundMusic = () => {
     console.log('⏸️ Pausando música de fondo')
@@ -98,10 +107,12 @@ export function BackgroundMusicProvider({ children }: { children: React.ReactNod
     isPaused,
     isTimerActive,
     timeRemaining,
+    volume,
     pauseBackgroundMusic,
     resumeBackgroundMusic,
     startTimer,
-    cancelTimer
+    cancelTimer,
+    setVolume
   }
 
   return (

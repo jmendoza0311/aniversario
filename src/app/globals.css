@@ -121,6 +121,19 @@
   }
 }
 
+/* Theme-specific styles */
+.light {
+  --gradient-from: #fdf2f8;
+  --gradient-via: #fce7f3;
+  --gradient-to: #ede9fe;
+}
+
+.dark {
+  --gradient-from: #1e1b4b;
+  --gradient-via: #581c87;
+  --gradient-to: #831843;
+}
+
 /* Estilos personalizados para el slider de volumen */
 .slider-thumb-white::-webkit-slider-thumb {
   appearance: none;

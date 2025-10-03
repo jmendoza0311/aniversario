@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Play, Heart, Sparkles, X } from 'lucide-react'
-import { useAudioContext } from '../contexts/AudioContext'
+import { useBackgroundMusic } from '../contexts/BackgroundMusicContext'
 
 interface Particle {
   id: number
@@ -33,7 +33,6 @@ export default function Finale() {
   const [showSecretButton, setShowSecretButton] = useState(false)
   const [showVideoModal, setShowVideoModal] = useState(false)
   const [messagePhase, setMessagePhase] = useState(0)
-  const { onPlaybackChange } = useAudioContext()
 
   // Start the finale sequence
   useEffect(() => {
@@ -52,46 +51,68 @@ export default function Finale() {
     }
   }, [])
 
-  // Particle system - optimized for mobile
+  // Particle system - optimized with requestAnimationFrame
   useEffect(() => {
     const isMobile = window.innerWidth < 768
-    const particleCount = isMobile ? 1 : 3 // Reduce particles on mobile
-    const interval = isMobile ? 400 : 200 // Slower interval on mobile
-    const maxParticles = isMobile ? 20 : 50 // Fewer max particles on mobile
-    
-    setInterval(() => {
-      // Create heart particles
-      const newParticles: Particle[] = []
-      
-      // Random heart particles
-      for (let i = 0; i < particleCount; i++) {
-        newParticles.push(createParticle('heart'))
-      }
-      
-      // Random star particles (less frequent on mobile)
-      if (Math.random() > (isMobile ? 0.8 : 0.7)) {
-        newParticles.push(createParticle('star'))
+    const particleCount = isMobile ? 1 : 2 // Reduce particles on mobile
+    const spawnRate = isMobile ? 600 : 300 // ms between spawns
+    const maxParticles = isMobile ? 15 : 30 // Fewer max particles
+
+    let lastSpawnTime = 0
+    let animationFrameId: number
+
+    const animate = (currentTime: number) => {
+      // Spawn new particles based on spawn rate
+      if (currentTime - lastSpawnTime > spawnRate) {
+        const newParticles: Particle[] = []
+
+        // Random heart particles
+        for (let i = 0; i < particleCount; i++) {
+          newParticles.push(createParticle('heart'))
+        }
+
+        // Random star particles (less frequent on mobile)
+        if (Math.random() > (isMobile ? 0.85 : 0.75)) {
+          newParticles.push(createParticle('star'))
+        }
+
+        setParticles(prev => {
+          const updated = [...prev, ...newParticles]
+            .map(particle => updateParticle(particle))
+            .filter(particle => particle.life > 0)
+
+          // Limit particles to prevent memory issues
+          return updated.slice(-maxParticles)
+        })
+
+        lastSpawnTime = currentTime
+      } else {
+        // Just update existing particles
+        setParticles(prev =>
+          prev
+            .map(particle => updateParticle(particle))
+            .filter(particle => particle.life > 0)
+        )
       }
 
-      setParticles(prev => {
-        const updated = [...prev, ...newParticles]
-          .map(particle => updateParticle(particle))
-          .filter(particle => particle.life > 0)
-        
-        // Limit particles to prevent memory issues
-        return updated.slice(-maxParticles)
-      })
-    }, interval)
+      animationFrameId = requestAnimationFrame(animate)
+    }
 
-    return () => clearInterval(interval)
+    animationFrameId = requestAnimationFrame(animate)
+
+    return () => {
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId)
+      }
+    }
   }, [])
 
   // Fireworks system - optimized for mobile
   useEffect(() => {
     const isMobile = window.innerWidth < 768
-    const fireworkInterval = isMobile ? 4000 : 2000 // Less frequent on mobile
-    const fireworkThreshold = isMobile ? 0.6 : 0.3 // Less likely on mobile
-    
+    const fireworkInterval = isMobile ? 5000 : 3000 // Less frequent overall
+    const fireworkThreshold = isMobile ? 0.7 : 0.5 // Less likely on mobile
+
     const interval = setInterval(() => {
       if (Math.random() > fireworkThreshold) {
         createFirework()
@@ -473,34 +494,26 @@ interface VideoModalProps {
 }
 
 function VideoModal({ onClose }: VideoModalProps) {
-  const { onPlaybackChange } = useAudioContext()
+  const { pauseBackgroundMusic, resumeBackgroundMusic } = useBackgroundMusic()
 
   const handleVideoPlay = () => {
-    // Notificar que se está reproduciendo contenido (igual que el cancionero)
-    if (onPlaybackChange) {
-      onPlaybackChange(true)
-    }
+    // Pausar música de fondo cuando comienza el video
+    pauseBackgroundMusic()
   }
 
   const handleVideoPause = () => {
-    // Notificar que se pausó el contenido (igual que el cancionero)
-    if (onPlaybackChange) {
-      onPlaybackChange(false)
-    }
+    // Reanudar música de fondo cuando se pausa el video
+    resumeBackgroundMusic()
   }
 
   const handleVideoEnded = () => {
-    // Notificar que terminó el contenido (igual que el cancionero)
-    if (onPlaybackChange) {
-      onPlaybackChange(false)
-    }
+    // Reanudar música de fondo cuando termina el video
+    resumeBackgroundMusic()
   }
 
   const handleClose = () => {
-    // Asegurar que se notifique que se detuvo el contenido al cerrar
-    if (onPlaybackChange) {
-      onPlaybackChange(false)
-    }
+    // Reanudar música de fondo al cerrar el modal
+    resumeBackgroundMusic()
     onClose()
   }
 
